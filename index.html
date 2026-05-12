@@ -410,6 +410,11 @@ input[type="month"].form-input{font-family:var(--mono);color-scheme:dark;}
 .stu-cell-date{font-size:9px;margin-top:2px;color:var(--green);font-weight:700;}
 /* 수정 모드 배너 */
 .edit-banner{background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:10px;padding:8px 12px;margin-bottom:12px;font-size:12px;color:var(--accent);display:flex;align-items:center;gap:8px;}
+
+.subj-row .time-slot-del{width:28px;height:28px;font-size:16px;border-radius:6px;background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.2);}
+.subj-row .time-slot-del:hover{background:rgba(248,113,113,0.25);}
+.subj-time-over{border-color:var(--red) !important;color:var(--red);}
+.subj-time-warn{font-size:11px;color:var(--red);margin-top:4px;display:none;}
 </style>
 </head>
 <body>
@@ -541,43 +546,59 @@ input[type="month"].form-input{font-family:var(--mono);color-scheme:dark;}
     <div class="form-group">
       <label class="form-label">📝 과목별 공부 내용 & 시간</label>
       <div class="subj-grid" id="subj-grid-wrap">
-        <div class="subj-row">
+        <div class="subj-row" id="subj-row-kr">
           <div class="subj-label kr">국어</div>
           <div class="subj-col">
-            <select class="subj-time-sel" id="ft-kr" onchange="updateSubjTimeSum()"><option value="0">-분</option><option value="10">10분</option><option value="20">20분</option><option value="30">30분</option><option value="40">40분</option><option value="50">50분</option><option value="60">1시간 </option><option value="70">1시간 10분</option><option value="80">1시간 20분</option><option value="90">1시간 30분</option><option value="100">1시간 40분</option><option value="110">1시간 50분</option><option value="120">2시간 </option><option value="130">2시간 10분</option><option value="140">2시간 20분</option><option value="150">2시간 30분</option><option value="160">2시간 40분</option><option value="170">2시간 50분</option><option value="180">3시간 </option></select>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <select class="subj-time-sel" id="ft-kr" onchange="updateSubjTimeSum()"><option value="0">-</option><option value="10">10분</option><option value="20">20분</option><option value="30">30분</option><option value="40">40분</option><option value="50">50분</option><option value="60">1시간</option><option value="70">1시간 10분</option><option value="80">1시간 20분</option><option value="90">1시간 30분</option><option value="100">1시간 40분</option><option value="110">1시간 50분</option><option value="120">2시간</option><option value="130">2시간 10분</option><option value="140">2시간 20분</option><option value="150">2시간 30분</option><option value="160">2시간 40분</option><option value="170">2시간 50분</option><option value="180">3시간</option><option value="190">3시간 10분</option><option value="200">3시간 20분</option><option value="210">3시간 30분</option><option value="220">3시간 40분</option><option value="230">3시간 50분</option><option value="240">4시간</option><option value="250">4시간 10분</option><option value="260">4시간 20분</option><option value="270">4시간 30분</option><option value="280">4시간 40분</option><option value="290">4시간 50분</option><option value="300">5시간</option></select>
+              <button class="time-slot-del" onclick="clearSubj('kr')" title="국어 초기화" style="flex-shrink:0">×</button>
+            </div>
             <textarea class="subj-input" id="f-kr" placeholder="국어 공부 내용" rows="1" oninput="autoResize(this)"></textarea>
           </div>
         </div>
-        <div class="subj-row">
+        <div class="subj-row" id="subj-row-en">
           <div class="subj-label en">영어</div>
           <div class="subj-col">
-            <select class="subj-time-sel" id="ft-en" onchange="updateSubjTimeSum()"><option value="0">-분</option><option value="10">10분</option><option value="20">20분</option><option value="30">30분</option><option value="40">40분</option><option value="50">50분</option><option value="60">1시간 </option><option value="70">1시간 10분</option><option value="80">1시간 20분</option><option value="90">1시간 30분</option><option value="100">1시간 40분</option><option value="110">1시간 50분</option><option value="120">2시간 </option><option value="130">2시간 10분</option><option value="140">2시간 20분</option><option value="150">2시간 30분</option><option value="160">2시간 40분</option><option value="170">2시간 50분</option><option value="180">3시간 </option></select>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <select class="subj-time-sel" id="ft-en" onchange="updateSubjTimeSum()"><option value="0">-</option><option value="10">10분</option><option value="20">20분</option><option value="30">30분</option><option value="40">40분</option><option value="50">50분</option><option value="60">1시간</option><option value="70">1시간 10분</option><option value="80">1시간 20분</option><option value="90">1시간 30분</option><option value="100">1시간 40분</option><option value="110">1시간 50분</option><option value="120">2시간</option><option value="130">2시간 10분</option><option value="140">2시간 20분</option><option value="150">2시간 30분</option><option value="160">2시간 40분</option><option value="170">2시간 50분</option><option value="180">3시간</option><option value="190">3시간 10분</option><option value="200">3시간 20분</option><option value="210">3시간 30분</option><option value="220">3시간 40분</option><option value="230">3시간 50분</option><option value="240">4시간</option><option value="250">4시간 10분</option><option value="260">4시간 20분</option><option value="270">4시간 30분</option><option value="280">4시간 40분</option><option value="290">4시간 50분</option><option value="300">5시간</option></select>
+              <button class="time-slot-del" onclick="clearSubj('en')" title="영어 초기화" style="flex-shrink:0">×</button>
+            </div>
             <textarea class="subj-input" id="f-en" placeholder="영어 공부 내용" rows="1" oninput="autoResize(this)"></textarea>
           </div>
         </div>
-        <div class="subj-row">
+        <div class="subj-row" id="subj-row-ma">
           <div class="subj-label ma">수학</div>
           <div class="subj-col">
-            <select class="subj-time-sel" id="ft-ma" onchange="updateSubjTimeSum()"><option value="0">-분</option><option value="10">10분</option><option value="20">20분</option><option value="30">30분</option><option value="40">40분</option><option value="50">50분</option><option value="60">1시간 </option><option value="70">1시간 10분</option><option value="80">1시간 20분</option><option value="90">1시간 30분</option><option value="100">1시간 40분</option><option value="110">1시간 50분</option><option value="120">2시간 </option><option value="130">2시간 10분</option><option value="140">2시간 20분</option><option value="150">2시간 30분</option><option value="160">2시간 40분</option><option value="170">2시간 50분</option><option value="180">3시간 </option></select>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <select class="subj-time-sel" id="ft-ma" onchange="updateSubjTimeSum()"><option value="0">-</option><option value="10">10분</option><option value="20">20분</option><option value="30">30분</option><option value="40">40분</option><option value="50">50분</option><option value="60">1시간</option><option value="70">1시간 10분</option><option value="80">1시간 20분</option><option value="90">1시간 30분</option><option value="100">1시간 40분</option><option value="110">1시간 50분</option><option value="120">2시간</option><option value="130">2시간 10분</option><option value="140">2시간 20분</option><option value="150">2시간 30분</option><option value="160">2시간 40분</option><option value="170">2시간 50분</option><option value="180">3시간</option><option value="190">3시간 10분</option><option value="200">3시간 20분</option><option value="210">3시간 30분</option><option value="220">3시간 40분</option><option value="230">3시간 50분</option><option value="240">4시간</option><option value="250">4시간 10분</option><option value="260">4시간 20분</option><option value="270">4시간 30분</option><option value="280">4시간 40분</option><option value="290">4시간 50분</option><option value="300">5시간</option></select>
+              <button class="time-slot-del" onclick="clearSubj('ma')" title="수학 초기화" style="flex-shrink:0">×</button>
+            </div>
             <textarea class="subj-input" id="f-ma" placeholder="수학 공부 내용" rows="1" oninput="autoResize(this)"></textarea>
           </div>
         </div>
-        <div class="subj-row">
+        <div class="subj-row" id="subj-row-e1">
           <div class="subj-label e1">탐구1</div>
           <div class="subj-col">
-            <select class="subj-time-sel" id="ft-e1" onchange="updateSubjTimeSum()"><option value="0">-분</option><option value="10">10분</option><option value="20">20분</option><option value="30">30분</option><option value="40">40분</option><option value="50">50분</option><option value="60">1시간 </option><option value="70">1시간 10분</option><option value="80">1시간 20분</option><option value="90">1시간 30분</option><option value="100">1시간 40분</option><option value="110">1시간 50분</option><option value="120">2시간 </option><option value="130">2시간 10분</option><option value="140">2시간 20분</option><option value="150">2시간 30분</option><option value="160">2시간 40분</option><option value="170">2시간 50분</option><option value="180">3시간 </option></select>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <select class="subj-time-sel" id="ft-e1" onchange="updateSubjTimeSum()"><option value="0">-</option><option value="10">10분</option><option value="20">20분</option><option value="30">30분</option><option value="40">40분</option><option value="50">50분</option><option value="60">1시간</option><option value="70">1시간 10분</option><option value="80">1시간 20분</option><option value="90">1시간 30분</option><option value="100">1시간 40분</option><option value="110">1시간 50분</option><option value="120">2시간</option><option value="130">2시간 10분</option><option value="140">2시간 20분</option><option value="150">2시간 30분</option><option value="160">2시간 40분</option><option value="170">2시간 50분</option><option value="180">3시간</option><option value="190">3시간 10분</option><option value="200">3시간 20분</option><option value="210">3시간 30분</option><option value="220">3시간 40분</option><option value="230">3시간 50분</option><option value="240">4시간</option><option value="250">4시간 10분</option><option value="260">4시간 20분</option><option value="270">4시간 30분</option><option value="280">4시간 40분</option><option value="290">4시간 50분</option><option value="300">5시간</option></select>
+              <button class="time-slot-del" onclick="clearSubj('e1')" title="탐구1 초기화" style="flex-shrink:0">×</button>
+            </div>
             <textarea class="subj-input" id="f-e1" placeholder="탐구1 공부 내용" rows="1" oninput="autoResize(this)"></textarea>
           </div>
         </div>
-        <div class="subj-row">
+        <div class="subj-row" id="subj-row-e2">
           <div class="subj-label e2">탐구2</div>
           <div class="subj-col">
-            <select class="subj-time-sel" id="ft-e2" onchange="updateSubjTimeSum()"><option value="0">-분</option><option value="10">10분</option><option value="20">20분</option><option value="30">30분</option><option value="40">40분</option><option value="50">50분</option><option value="60">1시간 </option><option value="70">1시간 10분</option><option value="80">1시간 20분</option><option value="90">1시간 30분</option><option value="100">1시간 40분</option><option value="110">1시간 50분</option><option value="120">2시간 </option><option value="130">2시간 10분</option><option value="140">2시간 20분</option><option value="150">2시간 30분</option><option value="160">2시간 40분</option><option value="170">2시간 50분</option><option value="180">3시간 </option></select>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <select class="subj-time-sel" id="ft-e2" onchange="updateSubjTimeSum()"><option value="0">-</option><option value="10">10분</option><option value="20">20분</option><option value="30">30분</option><option value="40">40분</option><option value="50">50분</option><option value="60">1시간</option><option value="70">1시간 10분</option><option value="80">1시간 20분</option><option value="90">1시간 30분</option><option value="100">1시간 40분</option><option value="110">1시간 50분</option><option value="120">2시간</option><option value="130">2시간 10분</option><option value="140">2시간 20분</option><option value="150">2시간 30분</option><option value="160">2시간 40분</option><option value="170">2시간 50분</option><option value="180">3시간</option><option value="190">3시간 10분</option><option value="200">3시간 20분</option><option value="210">3시간 30분</option><option value="220">3시간 40분</option><option value="230">3시간 50분</option><option value="240">4시간</option><option value="250">4시간 10분</option><option value="260">4시간 20분</option><option value="270">4시간 30분</option><option value="280">4시간 40분</option><option value="290">4시간 50분</option><option value="300">5시간</option></select>
+              <button class="time-slot-del" onclick="clearSubj('e2')" title="탐구2 초기화" style="flex-shrink:0">×</button>
+            </div>
             <textarea class="subj-input" id="f-e2" placeholder="탐구2 공부 내용" rows="1" oninput="autoResize(this)"></textarea>
           </div>
         </div>
       </div>
     </div>
+    <div id="subj-time-warn" class="subj-time-warn"></div>
     <button class="btn btn-primary" id="f-submit" onclick="submitRecord()">✓ 제출하기</button>
   </div>
 </div>
@@ -1820,8 +1841,9 @@ function makeTPWrap(uid) {
   var inp = document.createElement('input');
   inp.type = 'time';
   inp.id = 'f-'+uid;
-  inp.style.cssText = 'width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;color:var(--text);font-size:20px;font-weight:700;font-family:var(--mono),monospace;color-scheme:dark;-webkit-appearance:none;appearance:none;';
+  inp.style.cssText = 'width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;color:var(--text);font-size:20px;font-weight:700;font-family:var(--mono),monospace;color-scheme:dark;cursor:pointer;';
   inp.addEventListener('change', function(){ updateTotalTime(); });
+  inp.addEventListener('click', function(){ try{ this.showPicker(); }catch(e){} });
   wrap.appendChild(inp);
   return wrap;
 }
@@ -1904,10 +1926,65 @@ function updateTotalTime() {
   }
   // f-in, f-out 갱신
   if(slots.length>0){document.getElementById('f-in').value=slots[0].start; document.getElementById('f-out').value=slots[slots.length-1].end;}
+  // 과목 시간 제한 업데이트 (순환 방지: updateSubjTimeSum에서 직접 updateTotalTime 호출하지 않음)
+  var tMin=total;
+  ['ft-kr','ft-en','ft-ma','ft-e1','ft-e2'].forEach(function(id){
+    var sel=document.getElementById(id); if(!sel) return;
+    var cur=parseInt(sel.value||0);
+    var otherUsed=['ft-kr','ft-en','ft-ma','ft-e1','ft-e2'].filter(function(x){return x!==id;}).reduce(function(s,x){var e=document.getElementById(x);return s+(e?parseInt(e.value||0):0);},0);
+    var maxFor=tMin>0?tMin-otherUsed:300;
+    Array.from(sel.options).forEach(function(opt){
+      opt.disabled=(tMin>0&&parseInt(opt.value||0)>0&&parseInt(opt.value||0)>maxFor);
+    });
+    if(tMin>0&&cur>maxFor){sel.value='0';}
+  });
+  var warn=document.getElementById('subj-time-warn');
+  if(warn) warn.style.display='none';
 }
 
 function updateSubjTimeSum() {
   updateTotalTime();
+  var totalMin = getTotalMin();
+  var usedMin = ['ft-kr','ft-en','ft-ma','ft-e1','ft-e2'].reduce(function(sum,id){
+    var el=document.getElementById(id); return sum+(el?parseInt(el.value||0):0);
+  },0);
+  var remaining = totalMin - usedMin;
+
+  // 각 과목 드롭다운 옵션 제한
+  ['ft-kr','ft-en','ft-ma','ft-e1','ft-e2'].forEach(function(id){
+    var sel=document.getElementById(id); if(!sel) return;
+    var cur=parseInt(sel.value||0);
+    var otherUsed=usedMin-cur;
+    var maxForThis=totalMin>0?totalMin-otherUsed:300;
+    Array.from(sel.options).forEach(function(opt){
+      var v=parseInt(opt.value||0);
+      opt.disabled = (totalMin>0 && v>0 && v>maxForThis);
+    });
+    sel.classList.toggle('subj-time-over', totalMin>0 && cur>maxForThis);
+  });
+
+  // 경고 표시
+  var warn=document.getElementById('subj-time-warn');
+  if(warn){
+    if(totalMin>0 && usedMin>totalMin){
+      warn.style.display='block';
+      warn.textContent='⚠ 과목 합계('+usedMin+'분)가 총 자습시간('+totalMin+'분)을 초과합니다';
+    } else {
+      warn.style.display='none';
+    }
+  }
+}
+
+function getTotalMin(){
+  return collectTimeSlots().reduce(function(sum,s){
+    return sum+Math.max(0,calcDurMin(s.start,s.end));
+  },0);
+}
+
+function clearSubj(sid){
+  var sel=document.getElementById('ft-'+sid); if(sel) sel.value='0';
+  var ta=document.getElementById('f-'+sid); if(ta){ta.value=''; ta.style.height='36px';}
+  updateSubjTimeSum();
 }
 
 function reloadFormForDate() {
