@@ -395,6 +395,21 @@ input[type="month"].form-input{font-family:var(--mono);color-scheme:dark;}
 .subj-time-sel{flex-shrink:0;width:70px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:6px 4px;color:var(--text);font-size:12px;font-family:'Noto Sans KR',sans-serif;text-align:center;appearance:none;-webkit-appearance:none;cursor:pointer;height:36px;}
 .subj-time-sel:focus{outline:none;border-color:var(--accent);}
 .subj-col{flex:1;display:flex;flex-direction:column;gap:4px;}
+
+/* ── 날짜 선택 바 ── */
+.date-nav{display:flex;align-items:center;gap:8px;margin-bottom:14px;}
+.date-nav-btn{background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:8px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;color:var(--text-muted);transition:all 0.15s;flex-shrink:0;}
+.date-nav-btn:hover{border-color:var(--accent);color:var(--accent);}
+.date-nav-center{flex:1;text-align:center;}
+.date-nav-main{font-size:15px;font-weight:700;color:var(--text);cursor:pointer;display:inline-flex;align-items:center;gap:6px;}
+.date-nav-main:hover{color:var(--accent);}
+.date-nav-sub{font-size:11px;color:var(--text-muted);margin-top:2px;}
+.date-today-btn{font-size:10px;font-weight:700;background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.3);border-radius:6px;padding:4px 8px;color:var(--accent);cursor:pointer;flex-shrink:0;}
+.date-today-btn:hover{background:rgba(245,158,11,0.2);}
+/* 과거 기록 있으면 그리드 셀에 표시 */
+.stu-cell-date{font-size:9px;margin-top:2px;color:var(--green);font-weight:700;}
+/* 수정 모드 배너 */
+.edit-banner{background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:10px;padding:8px 12px;margin-bottom:12px;font-size:12px;color:var(--accent);display:flex;align-items:center;gap:8px;}
 </style>
 </head>
 <body>
@@ -440,9 +455,22 @@ input[type="month"].form-input{font-family:var(--mono);color-scheme:dark;}
 <div id="v-sel" class="view">
   <div class="back-row">
     <button class="back-btn" onclick="showView('v-home')"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 3L5 8l5 5"/></svg>뒤로</button>
-    <span class="back-row-right" id="sel-date"></span>
   </div>
-  <div class="sec-div">이름을 선택하세요</div>
+  <!-- 날짜 네비게이터 -->
+  <div class="date-nav">
+    <button class="date-nav-btn" onclick="changeSelDate(-1)">‹</button>
+    <div class="date-nav-center">
+      <div class="date-nav-main" onclick="openDatePicker()">
+        <span id="sel-date-label">날짜</span>
+        <span style="font-size:12px;color:var(--text-muted)">▾</span>
+      </div>
+      <div class="date-nav-sub" id="sel-date-sub"></div>
+    </div>
+    <button class="date-today-btn" onclick="goToday()">오늘</button>
+    <button class="date-nav-btn" onclick="changeSelDate(1)" id="sel-next-btn">›</button>
+  </div>
+  <input type="date" id="sel-date-picker" style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px;" onchange="onDatePickerChange()">
+  <div class="sec-div" style="margin-top:0">이름을 선택하세요</div>
   <div class="student-grid" id="stu-grid">
     <div class="loading-wrap" style="grid-column:1/-1"><div class="spinner"></div>로딩 중…</div>
   </div>
@@ -492,6 +520,7 @@ input[type="month"].form-input{font-family:var(--mono);color-scheme:dark;}
 <!-- STUDENT FORM -->
 <div id="v-form" class="view">
   <div class="back-row"><button class="back-btn" onclick="showView('v-sel')"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 3L5 8l5 5"/></svg>뒤로</button></div>
+  <div id="edit-banner" class="edit-banner" style="display:none">✏️ <span id="edit-banner-text"></span></div>
   <div class="form-who">
     <span class="form-who-num" id="f-num"></span>
     <span class="form-who-name" id="f-name"></span>
@@ -745,10 +774,49 @@ function onDateClick(){ curDate=kstDate(); }
 // ── 학생 선택 ──
 function goStudentSelect() {
   curDate=kstDate(); showView('v-sel');
-  document.getElementById('sel-date').textContent=fmtDate(curDate);
+  updateSelDateUI();
   if (!students.length) {
     api({action:'getStudents'}).then(function(res){ students=res; loadGridWithRecords(); }).catch(function(e){ document.getElementById('stu-grid').innerHTML='<div style="grid-column:1/-1;color:var(--red);padding:20px;text-align:center">오류: '+e.message+'</div>'; });
   } else { loadGridWithRecords(); }
+}
+
+function updateSelDateUI() {
+  var today=kstDate();
+  var d=new Date(curDate+'T00:00:00');
+  var dayNames=['일','월','화','수','목','금','토'];
+  var label=curDate===today?'오늘 · '+fmtDate(curDate):fmtDate(curDate);
+  document.getElementById('sel-date-label').textContent=label;
+  document.getElementById('sel-date-sub').textContent=dayNames[d.getDay()]+'요일'+(curDate<today?' · 과거 날짜':'');
+  document.getElementById('sel-next-btn').style.opacity=curDate>=today?'0.3':'1';
+  document.getElementById('sel-next-btn').disabled=curDate>=today;
+}
+
+function changeSelDate(delta) {
+  var d=new Date(curDate+'T00:00:00');
+  d.setDate(d.getDate()+delta);
+  var next=d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+  if(next>kstDate()) return;
+  curDate=next;
+  updateSelDateUI();
+  loadGridWithRecords();
+}
+
+function goToday() {
+  curDate=kstDate();
+  updateSelDateUI();
+  loadGridWithRecords();
+}
+
+function openDatePicker() {
+  var picker=document.getElementById('sel-date-picker');
+  picker.max=kstDate();
+  picker.value=curDate;
+  try { picker.showPicker(); } catch(e) { picker.focus(); picker.click(); }
+}
+
+function onDatePickerChange() {
+  var v=document.getElementById('sel-date-picker').value;
+  if(v && v<=kstDate()) { curDate=v; updateSelDateUI(); loadGridWithRecords(); }
 }
 function loadGridWithRecords() {
   api({action:'getRecords',date:curDate}).then(function(res){
@@ -797,6 +865,8 @@ function openForm() {
   document.getElementById('f-name').textContent=curStu.name;
   document.getElementById('f-date').textContent=fmtDate(curDate);
   document.getElementById('f-in').value=''; document.getElementById('f-out').value='';
+  // 수정 배너 초기화
+  document.getElementById('edit-banner').style.display='none';
   initTimeSlots();
   ['f-kr','f-en','f-ma','f-e1','f-e2'].forEach(function(id){
     var el=document.getElementById(id); if(el){el.value=''; el.style.height='36px';}
@@ -1424,6 +1494,7 @@ initHome();
 
 // ── 커스텀 시간 피커 ──
 var tpickerState = {in:{h:-1,m:-1}, out:{h:-1,m:-1}};
+function ensureTPState(id){ if(!tpickerState[id]) tpickerState[id]={h:-1,m:-1}; }
 
 function buildTPickerCols(id) {
   var hcol = document.getElementById('tpick-'+id+'-hcol');
@@ -1451,6 +1522,7 @@ function buildTPickerCols(id) {
 }
 
 function selectTPH(id, h) {
+  ensureTPState(id);
   tpickerState[id].h = h;
   document.getElementById('tpick-'+id+'-h').textContent = pad(h);
   document.getElementById('tpick-'+id+'-hcol').querySelectorAll('.tpick-item').forEach(function(el){el.classList.remove('selected');});
@@ -1462,6 +1534,7 @@ function selectTPH(id, h) {
 function selectTPM(id, m) {
   // 가장 가까운 5분 단위로
   var snapped = Math.round(m/5)*5; if(snapped>=60) snapped=55;
+  ensureTPState(id);
   tpickerState[id].m = snapped;
   document.getElementById('tpick-'+id+'-m').textContent = pad(snapped);
   document.getElementById('tpick-'+id+'-mcol').querySelectorAll('.tpick-item').forEach(function(el){el.classList.remove('selected');});
@@ -1484,6 +1557,7 @@ function syncFromNative(id) {
   var parts = val.split(':');
   var h = parseInt(parts[0]), m = parseInt(parts[1]);
   var snapped = Math.round(m/5)*5; if(snapped>=60){snapped=55;}
+  ensureTPState(id);
   tpickerState[id].h = h;
   tpickerState[id].m = snapped;
   document.getElementById('tpick-'+id+'-h').textContent = pad(h);
@@ -1523,6 +1597,7 @@ function toggleTPicker(id) {
     drop.style.display='block';
     disp.classList.add('open');
     // 선택값으로 스크롤
+    ensureTPState(id);
     var s=tpickerState[id];
     if(s.h>=0){var hel=document.getElementById('tpick-'+id+'-hi-'+s.h);if(hel)setTimeout(function(){hel.scrollIntoView({block:'center'});},50);}
     var snapped=s.m>=0?Math.round(s.m/5)*5:0;
@@ -1747,6 +1822,8 @@ function addTimeSlot(startVal, endVal) {
   list.appendChild(div);
   buildTPickerCols('sl'+id+'start');
   buildTPickerCols('sl'+id+'end');
+  ensureTPState('sl'+id+'start');
+  ensureTPState('sl'+id+'end');
   if(startVal) { document.getElementById('f-sl'+id+'start').value=startVal; syncFromNative('sl'+id+'start'); }
   if(endVal)   { document.getElementById('f-sl'+id+'end').value=endVal;   syncFromNative('sl'+id+'end'); }
   updateTotalTime();
