@@ -1621,13 +1621,13 @@ function openNative(e, id) {
 
 // 외부 클릭 시 닫기
 document.addEventListener('click', function(e){
-  ['in','out'].forEach(function(id){
-    var wrap = document.getElementById('tpick-'+id+'-wrap');
-    var drop = document.getElementById('tpick-'+id+'-drop');
-    var disp = document.getElementById('tpick-'+id+'-display');
+  document.querySelectorAll('.tpick-dropdown').forEach(function(drop){
+    if(drop.style.display==='none') return;
+    var wrap = drop.closest('.tpick-wrap');
     if(wrap && !wrap.contains(e.target)){
       drop.style.display='none';
-      disp.classList.remove('open');
+      var disp = wrap.querySelector('.tpick-display');
+      if(disp) disp.classList.remove('open');
     }
   });
 });
@@ -1788,50 +1788,99 @@ function openMyStats() {
 var timeSlots = []; // [{id, start, end}]
 var slotIdCounter = 0;
 
-function makeTPickerMini(slotId, role) {
-  // role: 'start' or 'end'
-  var uid = 'sl'+slotId+role;
-  return '<div class="tpick-wrap" id="tpick-'+uid+'-wrap" style="flex:1">' +
-    '<input type="time" class="tpick-native" id="f-'+uid+'" oninput="syncFromNative(&quot;'+uid+'&quot;)">' +
-    '<div class="tpick-display" id="tpick-'+uid+'-display" onclick="toggleTPicker(&quot;'+uid+'&quot;)" style="padding:8px 6px 8px 10px;font-size:18px;">' +
-      '<span class="tpick-time-text"><span id="tpick-'+uid+'-h">--</span>:<span id="tpick-'+uid+'-m">--</span></span>' +
-      '<button class="tpick-icon-btn" onclick="openNative(event,&quot;'+uid+'&quot;)" style="width:28px;height:28px;font-size:14px">🕐</button>' +
-    '</div>' +
-    '<div class="tpick-dropdown" id="tpick-'+uid+'-drop" style="display:none">' +
-      '<div class="tpick-cols">' +
-        '<div class="tpick-col" id="tpick-'+uid+'-hcol"></div>' +
-        '<div class="tpick-sep">:</div>' +
-        '<div class="tpick-col" id="tpick-'+uid+'-mcol"></div>' +
-      '</div>' +
-    '</div>' +
-  '</div>';
+function makeTPWrap(uid) {
+  // 완전히 DOM으로 생성 - 따옴표 이슈 없음
+  var wrap = document.createElement('div');
+  wrap.className = 'tpick-wrap';
+  wrap.id = 'tpick-'+uid+'-wrap';
+  wrap.style.flex = '1';
+
+  var inp = document.createElement('input');
+  inp.type = 'time';
+  inp.className = 'tpick-native';
+  inp.id = 'f-'+uid;
+  inp.addEventListener('input', function(){ syncFromNative(uid); updateTotalTime(); });
+  wrap.appendChild(inp);
+
+  var disp = document.createElement('div');
+  disp.className = 'tpick-display';
+  disp.id = 'tpick-'+uid+'-display';
+  disp.style.cssText = 'padding:8px 6px 8px 10px;font-size:18px;';
+  disp.addEventListener('click', function(e){
+    if(e.target.closest('.tpick-icon-btn')) return;
+    toggleTPicker(uid);
+  });
+
+  var timeText = document.createElement('span');
+  timeText.className = 'tpick-time-text';
+  var hSpan = document.createElement('span');
+  hSpan.id = 'tpick-'+uid+'-h'; hSpan.textContent = '--';
+  var colon = document.createTextNode(':');
+  var mSpan = document.createElement('span');
+  mSpan.id = 'tpick-'+uid+'-m'; mSpan.textContent = '--';
+  timeText.appendChild(hSpan); timeText.appendChild(colon); timeText.appendChild(mSpan);
+  disp.appendChild(timeText);
+
+  var iconBtn = document.createElement('button');
+  iconBtn.className = 'tpick-icon-btn';
+  iconBtn.style.cssText = 'width:28px;height:28px;font-size:14px';
+  iconBtn.title = '시스템 시간 선택';
+  iconBtn.textContent = '🕐';
+  iconBtn.addEventListener('click', function(e){ e.stopPropagation(); openNative(e, uid); });
+  disp.appendChild(iconBtn);
+  wrap.appendChild(disp);
+
+  var drop = document.createElement('div');
+  drop.className = 'tpick-dropdown';
+  drop.id = 'tpick-'+uid+'-drop';
+  drop.style.display = 'none';
+  var cols = document.createElement('div');
+  cols.className = 'tpick-cols';
+  var hcol = document.createElement('div');
+  hcol.className = 'tpick-col'; hcol.id = 'tpick-'+uid+'-hcol';
+  var sep = document.createElement('div');
+  sep.className = 'tpick-sep'; sep.textContent = ':';
+  var mcol = document.createElement('div');
+  mcol.className = 'tpick-col'; mcol.id = 'tpick-'+uid+'-mcol';
+  cols.appendChild(hcol); cols.appendChild(sep); cols.appendChild(mcol);
+  drop.appendChild(cols);
+  wrap.appendChild(drop);
+
+  return wrap;
 }
 
 function addTimeSlot(startVal, endVal) {
   var id = slotIdCounter++;
   timeSlots.push({id:id});
   var list = document.getElementById('time-slot-list');
-  var div = document.createElement('div');
-  div.className = 'time-slot-row';
-  div.id = 'slot-row-'+id;
-  div.innerHTML =
-    makeTPickerMini(id,'start') +
-    '<span class="time-slot-sep">~</span>' +
-    makeTPickerMini(id,'end') +
-    '<button class="time-slot-del" onclick="removeTimeSlot('+id+')" title="삭제">×</button>';
-  list.appendChild(div);
+
+  var row = document.createElement('div');
+  row.className = 'time-slot-row';
+  row.id = 'slot-row-'+id;
+
+  row.appendChild(makeTPWrap('sl'+id+'start'));
+
+  var sep = document.createElement('span');
+  sep.className = 'time-slot-sep'; sep.textContent = '~';
+  row.appendChild(sep);
+
+  row.appendChild(makeTPWrap('sl'+id+'end'));
+
+  var delBtn = document.createElement('button');
+  delBtn.className = 'time-slot-del'; delBtn.title = '삭제'; delBtn.textContent = '×';
+  delBtn.addEventListener('click', function(){ removeTimeSlot(id); });
+  row.appendChild(delBtn);
+
+  list.appendChild(row);
+
   buildTPickerCols('sl'+id+'start');
   buildTPickerCols('sl'+id+'end');
   ensureTPState('sl'+id+'start');
   ensureTPState('sl'+id+'end');
+
   if(startVal) { document.getElementById('f-sl'+id+'start').value=startVal; syncFromNative('sl'+id+'start'); }
   if(endVal)   { document.getElementById('f-sl'+id+'end').value=endVal;   syncFromNative('sl'+id+'end'); }
   updateTotalTime();
-  // 입력 변경 시 총 시간 업데이트
-  ['f-sl'+id+'start','f-sl'+id+'end'].forEach(function(fid){
-    var el=document.getElementById(fid);
-    if(el) el.addEventListener('change', updateTotalTime);
-  });
 }
 
 function removeTimeSlot(id) {
