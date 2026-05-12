@@ -871,40 +871,54 @@ function doLoginPw() {
     if(res.ok){openForm();}else{errEl.textContent='비밀번호가 올바르지 않습니다.';document.getElementById('login-pw').value='';btn.textContent='확인';btn.disabled=false;}
   }).catch(function(e){errEl.textContent='오류: '+e.message;btn.textContent='확인';btn.disabled=false;});
 }
-function openForm() {
-  document.getElementById('f-num').textContent=curStu.num+'번';
-  document.getElementById('f-name').textContent=curStu.name;
-  document.getElementById('f-date').textContent=fmtDate(curDate);
-  document.getElementById('f-in').value=''; document.getElementById('f-out').value='';
-  // 수정 배너 초기화
+function clearForm() {
   document.getElementById('edit-banner').style.display='none';
-  initTimeSlots();
+  initTimeSlots([]);
   ['f-kr','f-en','f-ma','f-e1','f-e2'].forEach(function(id){
     var el=document.getElementById(id); if(el){el.value=''; el.style.height='36px';}
   });
   ['ft-kr','ft-en','ft-ma','ft-e1','ft-e2'].forEach(function(id){
     var el=document.getElementById(id); if(el) el.value='0';
   });
-  updateSubjTimeSum();
-  document.getElementById('f-submit').textContent='✓ 제출하기'; document.getElementById('f-submit').disabled=false;
+  document.getElementById('f-submit').textContent='✓ 제출하기';
+  document.getElementById('f-submit').disabled=false;
+}
+
+function applyRecord(ex) {
+  if(!ex) return;
+  var raw = ex.content||'';
+  // 슬롯 파싱
+  var slotMatch = raw.match(/\[SLOTS\]\s*([^\n]+)/);
+  if(slotMatch) {
+    initTimeSlots(slotMatch[1].split(','));
+  } else if(ex.checkin && ex.checkout) {
+    initTimeSlots([ex.checkin+'-'+ex.checkout]);
+  }
+  // 과목 파싱
+  var tmap={'국어':['f-kr','ft-kr'],'영어':['f-en','ft-en'],'수학':['f-ma','ft-ma'],'탐구1':['f-e1','ft-e1'],'탐구2':['f-e2','ft-e2']};
+  raw.split('\n').forEach(function(line){
+    var m=line.match(/^\[([^\]]+?)(?::(\d+))?\]\s*(.*)/);
+    if(!m || m[1]==='SLOTS') return;
+    var ids=tmap[m[1]]; if(!ids) return;
+    var el=document.getElementById(ids[0]); if(el){el.value=m[3]||''; autoResize(el);}
+    var te=document.getElementById(ids[1]); if(te) te.value=m[2]||'0';
+  });
+  document.getElementById('edit-banner').style.display='flex';
+  document.getElementById('edit-banner-text').textContent=fmtDate(curDate)+' 기록을 수정합니다';
+  document.getElementById('f-submit').textContent='✎ 수정하기';
+}
+
+function openForm() {
+  document.getElementById('f-num').textContent=curStu.num+'번';
+  document.getElementById('f-name').textContent=curStu.name;
+  document.getElementById('f-date').textContent=fmtDate(curDate);
+  updateSelDateUI();
+  clearForm();
+  showView('v-form');
   api({action:'getRecords',date:curDate}).then(function(recs){
     var ex=(recs||[]).find(function(r){return String(r.num)===String(curStu.num);});
-    if(ex){
-    var raw=ex.content||'';
-    var map={'국어':'f-kr','영어':'f-en','수학':'f-ma','탐구1':'f-e1','탐구2':'f-e2'};
-    ['f-kr','f-en','f-ma','f-e1','f-e2'].forEach(function(id){var el=document.getElementById(id);if(el){el.value='';el.style.height='36px';}});
-    if(raw.indexOf('[')===0){
-      raw.split('\n').forEach(function(line){
-        var m=line.match(/^\[(.+?)\]\s*(.*)$/);
-        if(m&&map[m[1]]){var el=document.getElementById(map[m[1]]);if(el){el.value=m[2];autoResize(el);}}
-      });
-    } else {
-      document.getElementById('f-kr').value=raw;
-    }
-    document.getElementById('f-submit').textContent='✎ 수정하기';
-  } else {initTPickerValues('','');}
+    if(ex) applyRecord(ex);
   }).catch(function(){});
-  showView('v-form');
 }
 function submitRecord() {
   // 시간 슬롯 수집
@@ -1849,14 +1863,19 @@ function removeTimeSlot(id) {
 
 function initTimeSlots(slotPairs) {
   timeSlots = []; slotIdCounter = 0;
-  document.getElementById('time-slot-list').innerHTML = '';
+  var list = document.getElementById('time-slot-list');
+  if(list) list.innerHTML = '';
   if(!slotPairs || slotPairs.length === 0) {
     addTimeSlot();
   } else {
     slotPairs.forEach(function(sp){
-      var parts = sp.split('-'); addTimeSlot(parts[0], parts[1]);
+      if(!sp) return;
+      var dashIdx = sp.indexOf('-', sp.indexOf(':')+3); // HH:MM-HH:MM
+      if(dashIdx<0) { addTimeSlot(sp,''); return; }
+      addTimeSlot(sp.slice(0,dashIdx), sp.slice(dashIdx+1));
     });
   }
+  document.getElementById('total-time-badge').style.display='none';
 }
 
 function collectTimeSlots() {
@@ -1893,37 +1912,11 @@ function updateSubjTimeSum() {
 
 function reloadFormForDate() {
   document.getElementById('f-date').textContent=fmtDate(curDate);
-  document.getElementById('edit-banner').style.display='none';
-  initTimeSlots();
-  ['f-kr','f-en','f-ma','f-e1','f-e2'].forEach(function(id){
-    var el=document.getElementById(id); if(el){el.value=''; el.style.height='36px';}
-  });
-  ['ft-kr','ft-en','ft-ma','ft-e1','ft-e2'].forEach(function(id){
-    var el=document.getElementById(id); if(el) el.value='0';
-  });
-  document.getElementById('f-submit').textContent='✓ 제출하기';
-  document.getElementById('f-submit').disabled=false;
+  clearForm();
   api({action:'getRecords',date:curDate}).then(function(recs){
     var ex=(recs||[]).find(function(r){return String(r.num)===String(curStu.num);});
-    if(ex){
-      var raw=ex.content||'';
-      var slotLine=raw.match(/\[SLOTS\]\s*(.+)/m);
-      if(slotLine){ initTimeSlots(slotLine[1].split(',')); }
-      else { initTimeSlots(ex.checkin&&ex.checkout?[ex.checkin+'-'+ex.checkout]:[]); }
-      var tmap={'국어':['f-kr','ft-kr'],'영어':['f-en','ft-en'],'수학':['f-ma','ft-ma'],'탐구1':['f-e1','ft-e1'],'탐구2':['f-e2','ft-e2']};
-      raw.split('\n').forEach(function(line){
-        var m=line.match(/^\[([^\]]+?)(?::(\d+))?\]\s*(.*)/);
-        if(!m||m[1]==='SLOTS') return;
-        if(tmap[m[1]]){
-          var el=document.getElementById(tmap[m[1]][0]); if(el){el.value=m[3]||'';autoResize(el);}
-          var te=document.getElementById(tmap[m[1]][1]); if(te) te.value=m[2]||'0';
-        }
-      });
-      document.getElementById('edit-banner').style.display='flex';
-      document.getElementById('edit-banner-text').textContent=fmtDate(curDate)+' 기록을 수정합니다';
-      document.getElementById('f-submit').textContent='✎ 수정하기';
-    }
-  });
+    if(ex) applyRecord(ex);
+  }).catch(function(){});
 }
 </script>
 
