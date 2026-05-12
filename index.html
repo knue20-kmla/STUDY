@@ -456,21 +456,7 @@ input[type="month"].form-input{font-family:var(--mono);color-scheme:dark;}
   <div class="back-row">
     <button class="back-btn" onclick="showView('v-home')"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 3L5 8l5 5"/></svg>뒤로</button>
   </div>
-  <!-- 날짜 네비게이터 -->
-  <div class="date-nav">
-    <button class="date-nav-btn" onclick="changeSelDate(-1)">‹</button>
-    <div class="date-nav-center">
-      <div class="date-nav-main" onclick="openDatePicker()">
-        <span id="sel-date-label">날짜</span>
-        <span style="font-size:12px;color:var(--text-muted)">▾</span>
-      </div>
-      <div class="date-nav-sub" id="sel-date-sub"></div>
-    </div>
-    <button class="date-today-btn" onclick="goToday()">오늘</button>
-    <button class="date-nav-btn" onclick="changeSelDate(1)" id="sel-next-btn">›</button>
-  </div>
-  <input type="date" id="sel-date-picker" style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px;" onchange="onDatePickerChange()">
-  <div class="sec-div" style="margin-top:0">이름을 선택하세요</div>
+  <div class="sec-div">이름을 선택하세요</div>
   <div class="student-grid" id="stu-grid">
     <div class="loading-wrap" style="grid-column:1/-1"><div class="spinner"></div>로딩 중…</div>
   </div>
@@ -520,6 +506,20 @@ input[type="month"].form-input{font-family:var(--mono);color-scheme:dark;}
 <!-- STUDENT FORM -->
 <div id="v-form" class="view">
   <div class="back-row"><button class="back-btn" onclick="showView('v-sel')"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 3L5 8l5 5"/></svg>뒤로</button></div>
+  <!-- 날짜 네비게이터 -->
+  <div class="date-nav">
+    <button class="date-nav-btn" onclick="changeFormDate(-1)">‹</button>
+    <div class="date-nav-center">
+      <div class="date-nav-main" onclick="openDatePicker()">
+        <span id="sel-date-label">날짜</span>
+        <span style="font-size:12px;color:var(--text-muted)">▾</span>
+      </div>
+      <div class="date-nav-sub" id="sel-date-sub"></div>
+    </div>
+    <button class="date-today-btn" onclick="goToday()">오늘</button>
+    <button class="date-nav-btn" onclick="changeFormDate(1)" id="sel-next-btn">›</button>
+  </div>
+  <input type="date" id="sel-date-picker" style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px;" onchange="onDatePickerChange()">
   <div id="edit-banner" class="edit-banner" style="display:none">✏️ <span id="edit-banner-text"></span></div>
   <div class="form-who">
     <span class="form-who-num" id="f-num"></span>
@@ -791,20 +791,24 @@ function updateSelDateUI() {
   document.getElementById('sel-next-btn').disabled=curDate>=today;
 }
 
-function changeSelDate(delta) {
+function changeFormDate(delta) {
   var d=new Date(curDate+'T00:00:00');
   d.setDate(d.getDate()+delta);
   var next=d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
   if(next>kstDate()) return;
   curDate=next;
   updateSelDateUI();
-  loadGridWithRecords();
+  reloadFormForDate();
 }
 
 function goToday() {
   curDate=kstDate();
   updateSelDateUI();
-  loadGridWithRecords();
+  if(document.getElementById('v-form').classList.contains('active')) {
+    reloadFormForDate();
+  } else {
+    loadGridWithRecords();
+  }
 }
 
 function openDatePicker() {
@@ -816,7 +820,14 @@ function openDatePicker() {
 
 function onDatePickerChange() {
   var v=document.getElementById('sel-date-picker').value;
-  if(v && v<=kstDate()) { curDate=v; updateSelDateUI(); loadGridWithRecords(); }
+  if(v && v<=kstDate()) {
+    curDate=v; updateSelDateUI();
+    if(document.getElementById('v-form').classList.contains('active')) {
+      reloadFormForDate();
+    } else {
+      loadGridWithRecords();
+    }
+  }
 }
 function loadGridWithRecords() {
   api({action:'getRecords',date:curDate}).then(function(res){
@@ -1789,66 +1800,17 @@ var timeSlots = []; // [{id, start, end}]
 var slotIdCounter = 0;
 
 function makeTPWrap(uid) {
-  // 완전히 DOM으로 생성 - 따옴표 이슈 없음
   var wrap = document.createElement('div');
-  wrap.className = 'tpick-wrap';
-  wrap.id = 'tpick-'+uid+'-wrap';
-  wrap.style.flex = '1';
+  wrap.style.cssText = 'flex:1;position:relative;';
 
   var inp = document.createElement('input');
   inp.type = 'time';
-  inp.className = 'tpick-native';
   inp.id = 'f-'+uid;
-  inp.addEventListener('input', function(){ syncFromNative(uid); updateTotalTime(); });
+  inp.style.cssText = 'width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;color:var(--text);font-size:20px;font-weight:700;font-family:var(--mono),monospace;color-scheme:dark;-webkit-appearance:none;appearance:none;';
+  inp.addEventListener('change', function(){ updateTotalTime(); });
   wrap.appendChild(inp);
-
-  var disp = document.createElement('div');
-  disp.className = 'tpick-display';
-  disp.id = 'tpick-'+uid+'-display';
-  disp.style.cssText = 'padding:8px 6px 8px 10px;font-size:18px;';
-  disp.addEventListener('click', function(e){
-    if(e.target.closest('.tpick-icon-btn')) return;
-    toggleTPicker(uid);
-  });
-
-  var timeText = document.createElement('span');
-  timeText.className = 'tpick-time-text';
-  var hSpan = document.createElement('span');
-  hSpan.id = 'tpick-'+uid+'-h'; hSpan.textContent = '--';
-  var colon = document.createTextNode(':');
-  var mSpan = document.createElement('span');
-  mSpan.id = 'tpick-'+uid+'-m'; mSpan.textContent = '--';
-  timeText.appendChild(hSpan); timeText.appendChild(colon); timeText.appendChild(mSpan);
-  disp.appendChild(timeText);
-
-  var iconBtn = document.createElement('button');
-  iconBtn.className = 'tpick-icon-btn';
-  iconBtn.style.cssText = 'width:28px;height:28px;font-size:14px';
-  iconBtn.title = '시스템 시간 선택';
-  iconBtn.textContent = '🕐';
-  iconBtn.addEventListener('click', function(e){ e.stopPropagation(); openNative(e, uid); });
-  disp.appendChild(iconBtn);
-  wrap.appendChild(disp);
-
-  var drop = document.createElement('div');
-  drop.className = 'tpick-dropdown';
-  drop.id = 'tpick-'+uid+'-drop';
-  drop.style.display = 'none';
-  var cols = document.createElement('div');
-  cols.className = 'tpick-cols';
-  var hcol = document.createElement('div');
-  hcol.className = 'tpick-col'; hcol.id = 'tpick-'+uid+'-hcol';
-  var sep = document.createElement('div');
-  sep.className = 'tpick-sep'; sep.textContent = ':';
-  var mcol = document.createElement('div');
-  mcol.className = 'tpick-col'; mcol.id = 'tpick-'+uid+'-mcol';
-  cols.appendChild(hcol); cols.appendChild(sep); cols.appendChild(mcol);
-  drop.appendChild(cols);
-  wrap.appendChild(drop);
-
   return wrap;
 }
-
 function addTimeSlot(startVal, endVal) {
   var id = slotIdCounter++;
   timeSlots.push({id:id});
@@ -1873,13 +1835,8 @@ function addTimeSlot(startVal, endVal) {
 
   list.appendChild(row);
 
-  buildTPickerCols('sl'+id+'start');
-  buildTPickerCols('sl'+id+'end');
-  ensureTPState('sl'+id+'start');
-  ensureTPState('sl'+id+'end');
-
-  if(startVal) { document.getElementById('f-sl'+id+'start').value=startVal; syncFromNative('sl'+id+'start'); }
-  if(endVal)   { document.getElementById('f-sl'+id+'end').value=endVal;   syncFromNative('sl'+id+'end'); }
+  if(startVal) { var s=document.getElementById('f-sl'+id+'start'); if(s) s.value=startVal; }
+  if(endVal)   { var e=document.getElementById('f-sl'+id+'end');   if(e) e.value=endVal; }
   updateTotalTime();
 }
 
@@ -1932,6 +1889,41 @@ function updateTotalTime() {
 
 function updateSubjTimeSum() {
   updateTotalTime();
+}
+
+function reloadFormForDate() {
+  document.getElementById('f-date').textContent=fmtDate(curDate);
+  document.getElementById('edit-banner').style.display='none';
+  initTimeSlots();
+  ['f-kr','f-en','f-ma','f-e1','f-e2'].forEach(function(id){
+    var el=document.getElementById(id); if(el){el.value=''; el.style.height='36px';}
+  });
+  ['ft-kr','ft-en','ft-ma','ft-e1','ft-e2'].forEach(function(id){
+    var el=document.getElementById(id); if(el) el.value='0';
+  });
+  document.getElementById('f-submit').textContent='✓ 제출하기';
+  document.getElementById('f-submit').disabled=false;
+  api({action:'getRecords',date:curDate}).then(function(recs){
+    var ex=(recs||[]).find(function(r){return String(r.num)===String(curStu.num);});
+    if(ex){
+      var raw=ex.content||'';
+      var slotLine=raw.match(/\[SLOTS\]\s*(.+)/m);
+      if(slotLine){ initTimeSlots(slotLine[1].split(',')); }
+      else { initTimeSlots(ex.checkin&&ex.checkout?[ex.checkin+'-'+ex.checkout]:[]); }
+      var tmap={'국어':['f-kr','ft-kr'],'영어':['f-en','ft-en'],'수학':['f-ma','ft-ma'],'탐구1':['f-e1','ft-e1'],'탐구2':['f-e2','ft-e2']};
+      raw.split('\n').forEach(function(line){
+        var m=line.match(/^\[([^\]]+?)(?::(\d+))?\]\s*(.*)/);
+        if(!m||m[1]==='SLOTS') return;
+        if(tmap[m[1]]){
+          var el=document.getElementById(tmap[m[1]][0]); if(el){el.value=m[3]||'';autoResize(el);}
+          var te=document.getElementById(tmap[m[1]][1]); if(te) te.value=m[2]||'0';
+        }
+      });
+      document.getElementById('edit-banner').style.display='flex';
+      document.getElementById('edit-banner-text').textContent=fmtDate(curDate)+' 기록을 수정합니다';
+      document.getElementById('f-submit').textContent='✎ 수정하기';
+    }
+  });
 }
 </script>
 
