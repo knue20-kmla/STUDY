@@ -337,6 +337,64 @@ input[type="month"].form-input{font-family:var(--mono);color-scheme:dark;}
   background:rgba(245,158,11,0.15);border-color:var(--accent);
   color:var(--accent);
 }
+
+/* ── 과목별 입력 폼 ── */
+.subj-grid { display:flex; flex-direction:column; gap:8px; }
+.subj-row { display:flex; align-items:flex-start; gap:10px; }
+.subj-label {
+  flex-shrink:0; width:52px; height:36px;
+  display:flex; align-items:center; justify-content:center;
+  border-radius:8px; font-size:11px; font-weight:900;
+  letter-spacing:0.03em;
+}
+.subj-label.kr  { background:rgba(167,139,250,0.18); color:#a78bfa; }
+.subj-label.en  { background:rgba(96,165,250,0.18);  color:#60a5fa; }
+.subj-label.ma  { background:rgba(52,211,153,0.18);  color:#34d399; }
+.subj-label.e1  { background:rgba(245,158,11,0.18);  color:#f59e0b; }
+.subj-label.e2  { background:rgba(248,113,113,0.18); color:#f87171; }
+.subj-input {
+  flex:1; background:var(--bg); border:1px solid var(--border);
+  border-radius:8px; padding:8px 12px; color:var(--text);
+  font-size:13px; font-family:'Noto Sans KR',sans-serif;
+  line-height:1.5; resize:none; min-height:36px; height:36px;
+  transition:border-color 0.2s, height 0.15s;
+  overflow:hidden;
+}
+.subj-input:focus { outline:none; border-color:var(--accent); }
+
+/* ── 학생 내 기록 분석 ── */
+.my-section-title{font-size:11px;font-weight:700;color:var(--accent);letter-spacing:0.08em;text-transform:uppercase;margin:16px 0 8px;}
+.subj-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px;}
+.subj-bar-label{width:40px;text-align:right;flex-shrink:0;font-weight:700;}
+.subj-bar-label.kr{color:#a78bfa;} .subj-bar-label.en{color:#60a5fa;} .subj-bar-label.ma{color:#34d399;} .subj-bar-label.e1{color:#f59e0b;} .subj-bar-label.e2{color:#f87171;}
+.subj-bar-wrap{flex:1;background:rgba(255,255,255,0.05);border-radius:4px;height:14px;overflow:hidden;}
+.subj-bar-fill{height:100%;border-radius:4px;transition:width 0.5s;}
+.subj-bar-val{width:28px;text-align:right;color:var(--text-muted);flex-shrink:0;}
+.my-rec-item{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:8px;}
+.my-rec-date{font-size:11px;color:var(--accent);font-weight:700;margin-bottom:6px;}
+.my-rec-time{font-size:11px;color:var(--text-muted);margin-bottom:6px;}
+.subj-tag{display:inline-block;border-radius:5px;font-size:10px;font-weight:700;padding:2px 7px;margin:2px 3px 2px 0;}
+.subj-tag.kr{background:rgba(167,139,250,0.15);color:#a78bfa;}
+.subj-tag.en{background:rgba(96,165,250,0.15);color:#60a5fa;}
+.subj-tag.ma{background:rgba(52,211,153,0.15);color:#34d399;}
+.subj-tag.e1{background:rgba(245,158,11,0.15);color:#f59e0b;}
+.subj-tag.e2{background:rgba(248,113,113,0.15);color:#f87171;}
+.subj-content-text{font-size:12px;color:var(--text);line-height:1.5;margin-top:3px;}
+
+/* ── 시간 슬롯 ── */
+.time-slot-list{display:flex;flex-direction:column;gap:8px;margin-bottom:8px;}
+.time-slot-row{display:flex;align-items:center;gap:8px;}
+.time-slot-sep{font-size:16px;color:var(--text-muted);flex-shrink:0;}
+.time-slot-del{background:none;border:none;color:var(--red);font-size:18px;cursor:pointer;padding:4px;line-height:1;flex-shrink:0;opacity:0.7;}
+.time-slot-del:hover{opacity:1;}
+.time-add-btn{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.04);border:1px dashed var(--border);border-radius:8px;padding:8px 12px;color:var(--text-muted);font-size:12px;cursor:pointer;width:100%;transition:all 0.15s;}
+.time-add-btn:hover{border-color:var(--accent);color:var(--accent);}
+.total-time-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(52,211,153,0.12);border:1px solid rgba(52,211,153,0.25);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;color:var(--green);margin-top:6px;}
+/* ── 과목별 시간 입력 ── */
+.subj-row{display:flex;align-items:flex-start;gap:8px;}
+.subj-time-sel{flex-shrink:0;width:70px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:6px 4px;color:var(--text);font-size:12px;font-family:'Noto Sans KR',sans-serif;text-align:center;appearance:none;-webkit-appearance:none;cursor:pointer;height:36px;}
+.subj-time-sel:focus{outline:none;border-color:var(--accent);}
+.subj-col{flex:1;display:flex;flex-direction:column;gap:4px;}
 </style>
 </head>
 <body>
@@ -440,48 +498,56 @@ input[type="month"].form-input{font-family:var(--mono);color-scheme:dark;}
     <span class="form-who-date" id="f-date"></span>
   </div>
   <div class="card">
-    <div class="time-row form-group">
-      <div>
-        <label class="form-label">🏃 입실 시간</label>
-        <div class="tpick-wrap" id="tpick-in-wrap">
-          <input type="time" class="form-input tpick-native" id="f-in" oninput="syncFromNative('in')">
-          <div class="tpick-display" id="tpick-in-display" onclick="toggleTPicker('in')">
-            <span class="tpick-time-text"><span id="tpick-in-h">--</span>:<span id="tpick-in-m">--</span></span>
-            <button class="tpick-icon-btn" onclick="openNative(event,'in')" title="시스템 시간 선택">🕐</button>
-          </div>
-          <div class="tpick-dropdown" id="tpick-in-drop" style="display:none">
-            <div class="tpick-cols">
-              <div class="tpick-col" id="tpick-in-hcol"></div>
-              <div class="tpick-sep">:</div>
-              <div class="tpick-col" id="tpick-in-mcol"></div>
-            </div>
-          </div>
-        </div>
+    <div class="form-group">
+      <label class="form-label">⏱ 공부 시간</label>
+      <div class="time-slot-list" id="time-slot-list"></div>
+      <button class="time-add-btn" onclick="addTimeSlot()">＋ 시간 추가</button>
+      <div class="total-time-badge" id="total-time-badge" style="display:none">
+        ⏱ 총 <span id="total-time-text">0분</span>
       </div>
-      <div>
-        <label class="form-label">🚶 퇴실 시간</label>
-        <div class="tpick-wrap" id="tpick-out-wrap">
-          <input type="time" class="form-input tpick-native" id="f-out" oninput="syncFromNative('out')">
-          <div class="tpick-display" id="tpick-out-display" onclick="toggleTPicker('out')">
-            <span class="tpick-time-text"><span id="tpick-out-h">--</span>:<span id="tpick-out-m">--</span></span>
-            <button class="tpick-icon-btn" onclick="openNative(event,'out')" title="시스템 시간 선택">🕐</button>
-          </div>
-          <div class="tpick-dropdown" id="tpick-out-drop" style="display:none">
-            <div class="tpick-cols">
-              <div class="tpick-col" id="tpick-out-hcol"></div>
-              <div class="tpick-sep">:</div>
-              <div class="tpick-col" id="tpick-out-mcol"></div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <!-- 기존 API 호환용 hidden -->
+      <input type="hidden" id="f-in">
+      <input type="hidden" id="f-out">
     </div>
     <div class="form-group">
-      <label class="form-label">📝 공부 내용</label>
-      <textarea class="form-input" id="f-content" placeholder="오늘 공부한 과목과 내용을 적어주세요
-
-예) 수학 - 미적분 기출 20문제
-    영어 - 독해 지문 5개 분석"></textarea>
+      <label class="form-label">📝 과목별 공부 내용 & 시간</label>
+      <div class="subj-grid" id="subj-grid-wrap">
+        <div class="subj-row">
+          <div class="subj-label kr">국어</div>
+          <div class="subj-col">
+            <select class="subj-time-sel" id="ft-kr" onchange="updateSubjTimeSum()"><option value="0">-분</option><option value="10">10분</option><option value="20">20분</option><option value="30">30분</option><option value="40">40분</option><option value="50">50분</option><option value="60">1시간 </option><option value="70">1시간 10분</option><option value="80">1시간 20분</option><option value="90">1시간 30분</option><option value="100">1시간 40분</option><option value="110">1시간 50분</option><option value="120">2시간 </option><option value="130">2시간 10분</option><option value="140">2시간 20분</option><option value="150">2시간 30분</option><option value="160">2시간 40분</option><option value="170">2시간 50분</option><option value="180">3시간 </option></select>
+            <textarea class="subj-input" id="f-kr" placeholder="국어 공부 내용" rows="1" oninput="autoResize(this)"></textarea>
+          </div>
+        </div>
+        <div class="subj-row">
+          <div class="subj-label en">영어</div>
+          <div class="subj-col">
+            <select class="subj-time-sel" id="ft-en" onchange="updateSubjTimeSum()"><option value="0">-분</option><option value="10">10분</option><option value="20">20분</option><option value="30">30분</option><option value="40">40분</option><option value="50">50분</option><option value="60">1시간 </option><option value="70">1시간 10분</option><option value="80">1시간 20분</option><option value="90">1시간 30분</option><option value="100">1시간 40분</option><option value="110">1시간 50분</option><option value="120">2시간 </option><option value="130">2시간 10분</option><option value="140">2시간 20분</option><option value="150">2시간 30분</option><option value="160">2시간 40분</option><option value="170">2시간 50분</option><option value="180">3시간 </option></select>
+            <textarea class="subj-input" id="f-en" placeholder="영어 공부 내용" rows="1" oninput="autoResize(this)"></textarea>
+          </div>
+        </div>
+        <div class="subj-row">
+          <div class="subj-label ma">수학</div>
+          <div class="subj-col">
+            <select class="subj-time-sel" id="ft-ma" onchange="updateSubjTimeSum()"><option value="0">-분</option><option value="10">10분</option><option value="20">20분</option><option value="30">30분</option><option value="40">40분</option><option value="50">50분</option><option value="60">1시간 </option><option value="70">1시간 10분</option><option value="80">1시간 20분</option><option value="90">1시간 30분</option><option value="100">1시간 40분</option><option value="110">1시간 50분</option><option value="120">2시간 </option><option value="130">2시간 10분</option><option value="140">2시간 20분</option><option value="150">2시간 30분</option><option value="160">2시간 40분</option><option value="170">2시간 50분</option><option value="180">3시간 </option></select>
+            <textarea class="subj-input" id="f-ma" placeholder="수학 공부 내용" rows="1" oninput="autoResize(this)"></textarea>
+          </div>
+        </div>
+        <div class="subj-row">
+          <div class="subj-label e1">탐구1</div>
+          <div class="subj-col">
+            <select class="subj-time-sel" id="ft-e1" onchange="updateSubjTimeSum()"><option value="0">-분</option><option value="10">10분</option><option value="20">20분</option><option value="30">30분</option><option value="40">40분</option><option value="50">50분</option><option value="60">1시간 </option><option value="70">1시간 10분</option><option value="80">1시간 20분</option><option value="90">1시간 30분</option><option value="100">1시간 40분</option><option value="110">1시간 50분</option><option value="120">2시간 </option><option value="130">2시간 10분</option><option value="140">2시간 20분</option><option value="150">2시간 30분</option><option value="160">2시간 40분</option><option value="170">2시간 50분</option><option value="180">3시간 </option></select>
+            <textarea class="subj-input" id="f-e1" placeholder="탐구1 공부 내용" rows="1" oninput="autoResize(this)"></textarea>
+          </div>
+        </div>
+        <div class="subj-row">
+          <div class="subj-label e2">탐구2</div>
+          <div class="subj-col">
+            <select class="subj-time-sel" id="ft-e2" onchange="updateSubjTimeSum()"><option value="0">-분</option><option value="10">10분</option><option value="20">20분</option><option value="30">30분</option><option value="40">40분</option><option value="50">50분</option><option value="60">1시간 </option><option value="70">1시간 10분</option><option value="80">1시간 20분</option><option value="90">1시간 30분</option><option value="100">1시간 40분</option><option value="110">1시간 50분</option><option value="120">2시간 </option><option value="130">2시간 10분</option><option value="140">2시간 20분</option><option value="150">2시간 30분</option><option value="160">2시간 40분</option><option value="170">2시간 50분</option><option value="180">3시간 </option></select>
+            <textarea class="subj-input" id="f-e2" placeholder="탐구2 공부 내용" rows="1" oninput="autoResize(this)"></textarea>
+          </div>
+        </div>
+      </div>
     </div>
     <button class="btn btn-primary" id="f-submit" onclick="submitRecord()">✓ 제출하기</button>
   </div>
@@ -492,7 +558,21 @@ input[type="month"].form-input{font-family:var(--mono);color-scheme:dark;}
   <div class="success-wrap">
     <div class="success-icon">✅</div>
     <div><div class="success-title">제출 완료!</div><div class="success-sub" id="ok-msg" style="margin-top:10px"></div></div>
-    <button class="btn btn-secondary" style="max-width:180px;margin-top:8px" onclick="showView('v-home')">홈으로 돌아가기</button>
+    <button class="btn btn-primary" style="max-width:220px;margin-top:8px" onclick="openMyStats()">📊 내 공부 분석 보기</button>
+    <button class="btn btn-secondary" style="max-width:180px;margin-top:6px" onclick="showView('v-home')">홈으로</button>
+  </div>
+</div>
+
+<!-- 학생 내 기록 분석 -->
+<div id="v-mystats" class="view">
+  <div class="back-row">
+    <button class="back-btn" onclick="showView('v-ok')">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 3L5 8l5 5"/></svg>뒤로
+    </button>
+    <span style="font-size:13px;font-weight:700;color:var(--accent)" id="mystats-title"></span>
+  </div>
+  <div class="card" id="mystats-content">
+    <div class="loading-wrap"><div class="spinner"></div>불러오는 중…</div>
   </div>
 </div>
 
@@ -716,20 +796,58 @@ function openForm() {
   document.getElementById('f-num').textContent=curStu.num+'번';
   document.getElementById('f-name').textContent=curStu.name;
   document.getElementById('f-date').textContent=fmtDate(curDate);
-  document.getElementById('f-in').value=''; document.getElementById('f-out').value=''; document.getElementById('f-content').value='';
+  document.getElementById('f-in').value=''; document.getElementById('f-out').value='';
+  initTimeSlots();
+  ['f-kr','f-en','f-ma','f-e1','f-e2'].forEach(function(id){
+    var el=document.getElementById(id); if(el){el.value=''; el.style.height='36px';}
+  });
+  ['ft-kr','ft-en','ft-ma','ft-e1','ft-e2'].forEach(function(id){
+    var el=document.getElementById(id); if(el) el.value='0';
+  });
+  updateSubjTimeSum();
   document.getElementById('f-submit').textContent='✓ 제출하기'; document.getElementById('f-submit').disabled=false;
-  buildTPickerCols('in'); buildTPickerCols('out');
   api({action:'getRecords',date:curDate}).then(function(recs){
     var ex=(recs||[]).find(function(r){return String(r.num)===String(curStu.num);});
-    if(ex){initTPickerValues(ex.checkin||'',ex.checkout||'');document.getElementById('f-content').value=ex.content||'';document.getElementById('f-submit').textContent='✎ 수정하기';} else {initTPickerValues('','');}
+    if(ex){
+    var raw=ex.content||'';
+    var map={'국어':'f-kr','영어':'f-en','수학':'f-ma','탐구1':'f-e1','탐구2':'f-e2'};
+    ['f-kr','f-en','f-ma','f-e1','f-e2'].forEach(function(id){var el=document.getElementById(id);if(el){el.value='';el.style.height='36px';}});
+    if(raw.indexOf('[')===0){
+      raw.split('\n').forEach(function(line){
+        var m=line.match(/^\[(.+?)\]\s*(.*)$/);
+        if(m&&map[m[1]]){var el=document.getElementById(map[m[1]]);if(el){el.value=m[2];autoResize(el);}}
+      });
+    } else {
+      document.getElementById('f-kr').value=raw;
+    }
+    document.getElementById('f-submit').textContent='✎ 수정하기';
+  } else {initTPickerValues('','');}
   }).catch(function(){});
   showView('v-form');
 }
 function submitRecord() {
-  var ci=document.getElementById('f-in').value, co=document.getElementById('f-out').value, ct=document.getElementById('f-content').value.trim();
-  if(!ci){toast('입실 시간을 입력해주세요','err');return;}
-  if(!co){toast('퇴실 시간을 입력해주세요','err');return;}
-  if(!ct){toast('공부 내용을 입력해주세요','err');return;}
+  // 시간 슬롯 수집
+  var slots = collectTimeSlots();
+  if(slots.length === 0){toast('공부 시간을 입력해주세요','err');return;}
+  var ci = slots[0].start;
+  var co = slots[slots.length-1].end;
+  var slotStr = slots.map(function(s){return s.start+'-'+s.end;}).join(',');
+
+  // 과목별 내용 + 시간 수집
+  var parts=[
+    {k:'국어',id:'f-kr',tid:'ft-kr'},{k:'영어',id:'f-en',tid:'ft-en'},
+    {k:'수학',id:'f-ma',tid:'ft-ma'},{k:'탐구1',id:'f-e1',tid:'ft-e1'},
+    {k:'탐구2',id:'f-e2',tid:'ft-e2'}
+  ];
+  var ct = '[SLOTS] '+slotStr+'\n' +
+    parts.filter(function(p){
+      return document.getElementById(p.id).value.trim() || parseInt(document.getElementById(p.tid).value||'0')>0;
+    }).map(function(p){
+      var min = document.getElementById(p.tid).value||'0';
+      return '['+p.k+':'+min+'] '+document.getElementById(p.id).value.trim();
+    }).join('\n');
+
+  if(!ct.replace('[SLOTS] '+slotStr,'').trim()){toast('공부 내용을 입력해주세요','err');return;}
   var btn=document.getElementById('f-submit'); btn.textContent='저장 중…'; btn.disabled=true;
   api({action:'saveRecord',record:{date:curDate,num:curStu.num,name:curStu.name,checkin:ci,checkout:co,content:ct}}).then(function(res){
     if(!res.success)throw new Error(res.error||'저장 실패');
@@ -751,7 +869,7 @@ function openTeacher() {
   document.getElementById('w-date').value=today;
   document.getElementById('m-month').value=today.slice(0,7);
   document.getElementById('a-start').value=today.slice(0,7)+'-01';
-  buildTPickerCols('in'); buildTPickerCols('out');
+  if(!document.getElementById('time-slot-list').children.length) initTimeSlots([]);
   document.getElementById('a-end').value=today;
   showView('v-teacher');
   loadDaily();
@@ -1230,6 +1348,48 @@ function loadAnalytics() {
       }).join(''):'<div style="color:var(--text-muted);font-size:12px;padding:8px">기록된 공부 내용이 없습니다</div>') +
       '</div></div>';
 
+    // ── 과목별 분석 ──
+    var sMap = {}; SUBJ_META.forEach(function(s){sMap[s.key]={min:0,count:0,contents:[]};});
+    myRecs.forEach(function(r){
+      var slots=parseSlots(r.content);
+      var slotMin=slots.length?slots.reduce(function(sum,s){return sum+Math.max(0,calcDurMin(s.start,s.end));},0):Math.max(0,calcDurMin(r.checkin,r.checkout));
+      var parsed=parseSubjects(r.content);
+      var activeCnt=SUBJ_META.filter(function(s){return parsed[s.key]!==undefined;}).length||1;
+      SUBJ_META.forEach(function(s){
+        if(parsed[s.key]!==undefined){
+          var sm=parsed[s.key].min||0;
+          sMap[s.key].min += sm>0 ? sm : slotMin/activeCnt;
+          sMap[s.key].count++;
+          if(parsed[s.key].text) sMap[s.key].contents.push({date:r.date,text:parsed[s.key].text,min:sm});
+        }
+      });
+    });
+    var maxSC=Math.max.apply(null,SUBJ_META.map(function(s){return sMap[s.key].min;}))||1;
+
+    html += '<div class="card" style="margin-bottom:12px"><div class="analytics-title">과목별 공부 시간 분석</div>';
+    SUBJ_META.forEach(function(s){
+      var pct=Math.round(sMap[s.key].min/maxSC*100);
+      var sh=Math.floor(sMap[s.key].min/60), sm=Math.round(sMap[s.key].min%60);
+      var valStr=sMap[s.key].min>0?(sh?sh+'h ':'')+sm+'m':'0m';
+      html += '<div class="subj-bar-row">' +
+        '<span class="subj-bar-label '+s.id+'">'+s.key+'</span>' +
+        '<div class="subj-bar-wrap"><div class="subj-bar-fill" style="width:'+pct+'%;background:'+s.color+'"></div></div>' +
+        '<span class="subj-bar-val">'+valStr+'</span></div>';
+    });
+    html += '<div style="height:8px"></div>';
+    SUBJ_META.forEach(function(s){
+      if(!sMap[s.key].contents.length) return;
+      html += '<div style="margin-bottom:10px">';
+      html += '<span class="subj-tag '+s.id+'" style="font-size:11px;padding:3px 8px;">'+s.key+'</span><span style="font-size:10px;color:var(--text-muted);margin-left:4px">'+sMap[s.key].count+'회</span>';
+      sMap[s.key].contents.slice(0,3).forEach(function(c){
+        var mLabel=c.min?'('+c.min+'분)':'';
+        html += '<div style="font-size:11px;color:var(--text-muted);margin:3px 0 3px 8px">'+c.date+' '+mLabel+' · <span style="color:var(--text)">'+c.text+'</span></div>';
+      });
+      if(sMap[s.key].contents.length>3) html += '<div style="font-size:10px;color:var(--text-muted);margin-left:8px">외 '+(sMap[s.key].contents.length-3)+'건 더…</div>';
+      html += '</div>';
+    });
+    html += '</div>';
+
     document.getElementById('analytics-content').innerHTML=html;
   }).catch(function(e){
     document.getElementById('analytics-content').innerHTML='<div style="color:var(--red);padding:20px;text-align:center">오류: '+e.message+'</div>';
@@ -1414,6 +1574,238 @@ function initTPickerValues(inVal, outVal) {
     document.getElementById('tpick-out-m').textContent='--';
     tpickerState.out={h:-1,m:-1};
   }
+}
+
+function autoResize(el) {
+  el.style.height = '36px';
+  el.style.height = el.scrollHeight + 'px';
+}
+
+// ── 학생 내 기록 분석 ──
+var SUBJ_META = [
+  {key:'국어', id:'kr', color:'#a78bfa'},
+  {key:'영어', id:'en', color:'#60a5fa'},
+  {key:'수학', id:'ma', color:'#34d399'},
+  {key:'탐구1',id:'e1', color:'#f59e0b'},
+  {key:'탐구2',id:'e2', color:'#f87171'}
+];
+
+function parseSubjects(content) {
+  var result = {};
+  if(!content) return result;
+  if(content.indexOf('[') === 0) {
+    content.split('\n').forEach(function(line){
+      var m = line.match(/^\[([^\]]+?)(?::(\d+))?\]\s*(.*)/);
+      if(!m) return;
+      var key=m[1], min=parseInt(m[2]||'0'), txt=m[3].trim();
+      if(key==='SLOTS') return;
+      result[key] = {text:txt, min:min};
+    });
+  } else {
+    result['기타'] = {text:content, min:0};
+  }
+  return result;
+}
+
+function parseSlots(content) {
+  if(!content) return [];
+  var m = content.match(/\[SLOTS\]\s*(.+)/);
+  if(!m) return [];
+  return m[1].split(',').map(function(sp){
+    var p=sp.split('-'); return {start:p[0],end:p[1]};
+  });
+}
+
+function openMyStats() {
+  if(!curStu) return;
+  document.getElementById('mystats-title').textContent = curStu.name + ' · 이번달 공부 기록';
+  document.getElementById('mystats-content').innerHTML = '<div class="loading-wrap"><div class="spinner"></div>불러오는 중…</div>';
+  showView('v-mystats');
+
+  var today = kstDate();
+  var monthStart = today.slice(0,7) + '-01';
+  api({action:'getRecordsRange', start:monthStart, end:today}).then(function(recs){
+    recs = (recs||[]).filter(function(r){return r.num == curStu.num;}).sort(function(a,b){return b.date.localeCompare(a.date);});
+
+    // 과목별 카운트
+    var subjCount = {}, subjMin = {};
+    SUBJ_META.forEach(function(s){subjCount[s.key]=0; subjMin[s.key]=0;});
+
+    var totalMin = 0;
+    recs.forEach(function(r){
+      var slots = parseSlots(r.content);
+      var slotMin = slots.length ? slots.reduce(function(sum,s){return sum+Math.max(0,calcDurMin(s.start,s.end));},0)
+                                 : Math.max(0,calcDurMin(r.checkin,r.checkout));
+      totalMin += slotMin;
+      var parsed = parseSubjects(r.content);
+      SUBJ_META.forEach(function(s){
+        if(parsed[s.key] !== undefined) {
+          subjCount[s.key]++;
+          var sm = parsed[s.key].min || 0;
+          subjMin[s.key] += sm > 0 ? sm : (slotMin / Math.max(1,Object.keys(parsed).length));
+        }
+      });
+    });
+
+    var maxCount = Math.max.apply(null, SUBJ_META.map(function(s){return subjMin[s.key];})) || 1;
+    var th = Math.floor(totalMin/60), tm = totalMin%60;
+
+    var html = '';
+
+    // 요약 카드
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;">' +
+      '<div style="text-align:center;background:rgba(255,255,255,0.04);border-radius:10px;padding:10px 4px;">' +
+        '<div style="font-size:20px;font-weight:900;color:var(--green)">' + th + 'h ' + tm + 'm</div>' +
+        '<div style="font-size:10px;color:var(--text-muted)">총 자습시간</div></div>' +
+      '<div style="text-align:center;background:rgba(255,255,255,0.04);border-radius:10px;padding:10px 4px;">' +
+        '<div style="font-size:20px;font-weight:900;color:var(--blue)">' + recs.length + '일</div>' +
+        '<div style="font-size:10px;color:var(--text-muted)">자습 출석</div></div>' +
+      '<div style="text-align:center;background:rgba(255,255,255,0.04);border-radius:10px;padding:10px 4px;">' +
+        '<div style="font-size:20px;font-weight:900;color:var(--accent)">' + (recs.length?Math.round(totalMin/recs.length):0) + 'm</div>' +
+        '<div style="font-size:10px;color:var(--text-muted)">일평균</div></div>' +
+    '</div>';
+
+    // 과목별 참여 횟수 바 차트
+    html += '<div class="my-section-title">과목별 공부 횟수 (이번달)</div>';
+    SUBJ_META.forEach(function(s){
+      var pct = Math.round(subjMin[s.key] / maxCount * 100);
+      var sh=Math.floor(subjMin[s.key]/60), sm=Math.round(subjMin[s.key]%60);
+      var valStr = subjMin[s.key]>0 ? (sh?sh+'h ':'')+sm+'m' : '0m';
+      html += '<div class="subj-bar-row">' +
+        '<span class="subj-bar-label ' + s.id + '">' + s.key + '</span>' +
+        '<div class="subj-bar-wrap"><div class="subj-bar-fill" style="width:' + pct + '%;background:' + s.color + '"></div></div>' +
+        '<span class="subj-bar-val">' + valStr + '</span>' +
+      '</div>';
+    });
+
+    // 최근 기록 상세
+    html += '<div class="my-section-title">최근 공부 기록</div>';
+    if(recs.length === 0) {
+      html += '<div style="color:var(--text-muted);font-size:13px;text-align:center;padding:16px">이번달 기록이 없습니다</div>';
+    } else {
+      recs.slice(0,10).forEach(function(r){
+        var dur = Math.max(0, calcDurMin(r.checkin, r.checkout));
+        var h = Math.floor(dur/60), m = dur%60;
+        var parsed = parseSubjects(r.content);
+        html += '<div class="my-rec-item">' +
+          '<div class="my-rec-date">' + r.date + '</div>' +
+          '<div class="my-rec-time">⏱ ' + r.checkin + ' ~ ' + r.checkout + ' (' + h + 'h ' + m + 'm)</div>' +
+          '<div>';
+        SUBJ_META.forEach(function(s){
+          if(parsed[s.key] !== undefined) {
+            html += '<div style="margin-bottom:4px">' +
+              '<span class="subj-tag ' + s.id + '">' + s.key + '</span>' +
+              '<span class="subj-content-text">' + (parsed[s.key]||'기록 없음') + '</span>' +
+            '</div>';
+          }
+        });
+        html += '</div></div>';
+      });
+    }
+
+    document.getElementById('mystats-content').innerHTML = html;
+  }).catch(function(e){
+    document.getElementById('mystats-content').innerHTML = '<div style="color:var(--red);padding:16px">오류: ' + e.message + '</div>';
+  });
+}
+
+// ── 시간 슬롯 관리 ──
+var timeSlots = []; // [{id, start, end}]
+var slotIdCounter = 0;
+
+function makeTPickerMini(slotId, role) {
+  // role: 'start' or 'end'
+  var uid = 'sl'+slotId+role;
+  return '<div class="tpick-wrap" id="tpick-'+uid+'-wrap" style="flex:1">' +
+    '<input type="time" class="tpick-native" id="f-'+uid+'" oninput="syncFromNative(&quot;'+uid+'&quot;)">' +
+    '<div class="tpick-display" id="tpick-'+uid+'-display" onclick="toggleTPicker(&quot;'+uid+'&quot;)" style="padding:8px 6px 8px 10px;font-size:18px;">' +
+      '<span class="tpick-time-text"><span id="tpick-'+uid+'-h">--</span>:<span id="tpick-'+uid+'-m">--</span></span>' +
+      '<button class="tpick-icon-btn" onclick="openNative(event,&quot;'+uid+'&quot;)" style="width:28px;height:28px;font-size:14px">🕐</button>' +
+    '</div>' +
+    '<div class="tpick-dropdown" id="tpick-'+uid+'-drop" style="display:none">' +
+      '<div class="tpick-cols">' +
+        '<div class="tpick-col" id="tpick-'+uid+'-hcol"></div>' +
+        '<div class="tpick-sep">:</div>' +
+        '<div class="tpick-col" id="tpick-'+uid+'-mcol"></div>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
+}
+
+function addTimeSlot(startVal, endVal) {
+  var id = slotIdCounter++;
+  timeSlots.push({id:id});
+  var list = document.getElementById('time-slot-list');
+  var div = document.createElement('div');
+  div.className = 'time-slot-row';
+  div.id = 'slot-row-'+id;
+  div.innerHTML =
+    makeTPickerMini(id,'start') +
+    '<span class="time-slot-sep">~</span>' +
+    makeTPickerMini(id,'end') +
+    '<button class="time-slot-del" onclick="removeTimeSlot('+id+')" title="삭제">×</button>';
+  list.appendChild(div);
+  buildTPickerCols('sl'+id+'start');
+  buildTPickerCols('sl'+id+'end');
+  if(startVal) { document.getElementById('f-sl'+id+'start').value=startVal; syncFromNative('sl'+id+'start'); }
+  if(endVal)   { document.getElementById('f-sl'+id+'end').value=endVal;   syncFromNative('sl'+id+'end'); }
+  updateTotalTime();
+  // 입력 변경 시 총 시간 업데이트
+  ['f-sl'+id+'start','f-sl'+id+'end'].forEach(function(fid){
+    var el=document.getElementById(fid);
+    if(el) el.addEventListener('change', updateTotalTime);
+  });
+}
+
+function removeTimeSlot(id) {
+  timeSlots = timeSlots.filter(function(s){return s.id!==id;});
+  var row = document.getElementById('slot-row-'+id);
+  if(row) row.remove();
+  updateTotalTime();
+}
+
+function initTimeSlots(slotPairs) {
+  timeSlots = []; slotIdCounter = 0;
+  document.getElementById('time-slot-list').innerHTML = '';
+  if(!slotPairs || slotPairs.length === 0) {
+    addTimeSlot();
+  } else {
+    slotPairs.forEach(function(sp){
+      var parts = sp.split('-'); addTimeSlot(parts[0], parts[1]);
+    });
+  }
+}
+
+function collectTimeSlots() {
+  var result = [];
+  document.querySelectorAll('.time-slot-row').forEach(function(row){
+    var m = row.id.match(/slot-row-(\d+)/); if(!m) return;
+    var id = m[1];
+    var s = document.getElementById('f-sl'+id+'start');
+    var e = document.getElementById('f-sl'+id+'end');
+    if(s&&e&&s.value&&e.value) result.push({start:s.value, end:e.value});
+  });
+  return result;
+}
+
+function updateTotalTime() {
+  var slots = collectTimeSlots();
+  var total = slots.reduce(function(sum,s){return sum+Math.max(0,calcDurMin(s.start,s.end));},0);
+  var badge = document.getElementById('total-time-badge');
+  var txt = document.getElementById('total-time-text');
+  if(total>0 && slots.length>0){
+    var h=Math.floor(total/60), m=total%60;
+    txt.textContent = (h?h+'시간 ':'')+(m?m+'분':'');
+    badge.style.display='inline-flex';
+  } else {
+    badge.style.display='none';
+  }
+  // f-in, f-out 갱신
+  if(slots.length>0){document.getElementById('f-in').value=slots[0].start; document.getElementById('f-out').value=slots[slots.length-1].end;}
+}
+
+function updateSubjTimeSum() {
+  updateTotalTime();
 }
 </script>
 
