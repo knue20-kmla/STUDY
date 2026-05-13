@@ -954,13 +954,10 @@ function applyRecord(ex) {
   document.getElementById('f-submit').textContent='✎ 수정하기';
 }
 
-function openForm() {
-  document.getElementById('f-num').textContent=curStu.num+'번';
-  document.getElementById('f-name').textContent=curStu.name;
+function reloadFormForDate() {
   document.getElementById('f-date').textContent=fmtDate(curDate);
   updateSelDateUI();
   clearForm();
-  showView('v-form');
   api({action:'getRecords',date:curDate}).then(function(recs){
     var ex=(recs||[]).find(function(r){return String(r.num)===String(curStu.num);});
     if(ex) applyRecord(ex);
