@@ -828,7 +828,7 @@ function initHome() {
   document.getElementById('h-day').textContent=d.getDate();
   document.getElementById('h-ym').textContent=d.getFullYear()+'년 '+(d.getMonth()+1)+'월';
 }
-function onDateClick(){ curDate=kstDate(); }
+function onDateClick(){ curDate=kstDate(); goStudentSelect(); }
 
 // ── 학생 선택 ──
 function goStudentSelect() {
@@ -1876,12 +1876,12 @@ function renderSlotCards() {
         return '<span class="subj-tag '+s.sid+'">'+s.name+(info.min?' '+minLabel(info.min):'')+'</span>';
       }).join('');
     return '<div class="slot-card" onclick="openSlotEditor('+sl.id+')">'+
-      '<div>'+
+      '<div style="flex-shrink:0">'+
         '<div class="slot-card-time">'+sl.start+' ~ '+sl.end+'</div>'+
         '<div class="slot-card-dur">'+durStr+'</div>'+
       '</div>'+
-      '<div class="slot-card-tags">'+(tags||'<span class="slot-card-empty">내용 미입력</span>')+'</div>'+
-      '<span class="slot-card-arrow">›</span>'+
+      '<div class="slot-card-tags" style="flex:1">'+(tags||'<span class="slot-card-empty">내용 미입력 — 탭하여 입력</span>')+'</div>'+
+      '<span class="slot-card-arrow" style="color:var(--accent)">›</span>'+
     '</div>';
   }).join('');
 
@@ -1909,19 +1909,43 @@ function openSlotEditor(id) {
   var sl = slotData.find(function(s){return s.id===id;});
   if(!sl) return;
   editSlotId = id;
+
+  // 1. 먼저 편집기 전체 초기화
+  document.getElementById('fe-start').value = '';
+  document.getElementById('fe-end').value = '';
+  document.getElementById('fe-duration').textContent = '';
+  document.getElementById('fe-subj-warn').style.display = 'none';
+  SUBJ_LIST.forEach(function(s){
+    var sel = document.getElementById('eft-'+s.sid);
+    sel.value = '0';
+    Array.from(sel.options).forEach(function(o){ o.disabled=false; });
+    var ta = document.getElementById('ef-'+s.sid);
+    ta.value = ''; ta.style.height = '36px';
+  });
+
+  // 2. 슬롯 데이터로 채우기
   var isNew = !sl.start && !sl.end;
-  document.getElementById('fe-title').textContent = isNew ? '새 시간대 추가' : sl.start+' ~ '+sl.end+' 수정';
+  document.getElementById('fe-title').textContent = isNew
+    ? '새 공부 시간 입력'
+    : sl.start + ' ~ ' + sl.end + ' 수정 (클릭해서 변경)';
   document.getElementById('fe-start').value = sl.start||'';
   document.getElementById('fe-end').value   = sl.end||'';
-  onEditorTimeChange();
-  SUBJ_LIST.forEach(function(s){
-    var info = sl.subjects[s.sid]||{min:0,text:''};
-    document.getElementById('eft-'+s.sid).value = info.min||0;
-    var ta=document.getElementById('ef-'+s.sid);
-    ta.value = info.text||''; autoResize(ta);
-  });
+
+  if(!isNew) {
+    onEditorTimeChange();
+    SUBJ_LIST.forEach(function(s){
+      var info = sl.subjects[s.sid]||{min:0,text:''};
+      document.getElementById('eft-'+s.sid).value = info.min||0;
+      var ta = document.getElementById('ef-'+s.sid);
+      ta.value = info.text||'';
+      if(info.text) autoResize(ta); else ta.style.height='36px';
+    });
+  }
+
+  // 3. 화면 전환
   document.getElementById('fp-list').style.display='none';
   document.getElementById('fp-edit').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 
 // ── 편집기에서 시간 변경 시 옵션 제한 ──
@@ -1973,18 +1997,30 @@ function saveSlotEdit() {
       text:document.getElementById('ef-'+s.sid).value.trim()
     };
   });
+  toast('저장했습니다 ✓');
   closeSlotEditor();
 }
 
 function closeSlotEditor() {
+  // 시간 미입력 새 슬롯이면 제거
+  var sl = slotData.find(function(s){return s.id===editSlotId;});
+  if(sl && !sl.start && !sl.end) {
+    slotData = slotData.filter(function(s){return s.id!==editSlotId;});
+  }
+  editSlotId = null;
   document.getElementById('fp-edit').style.display='none';
   document.getElementById('fp-list').style.display='block';
   renderSlotCards();
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 
 function deleteCurrentSlot() {
+  if(!confirm('이 시간대를 삭제할까요?')) return;
   slotData = slotData.filter(function(s){return s.id!==editSlotId;});
-  closeSlotEditor();
+  editSlotId = null;
+  document.getElementById('fp-edit').style.display='none';
+  document.getElementById('fp-list').style.display='block';
+  renderSlotCards();
 }
 
 // ── 구 API 호환: initTimeSlots, collectTimeSlots ──
