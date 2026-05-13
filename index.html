@@ -995,8 +995,15 @@ function goTeacherLogin(){ if(teacherOk){openTeacher();return;} document.getElem
 function doTeacherLogin(){
   var pw=document.getElementById('t-pw').value;
   api({action:'verifyTeacher',pw:pw}).then(function(res){
-    if(res.ok){teacherOk=true;cachedPw=pw;openTeacher();}else{document.getElementById('t-pw-err').textContent='비밀번호가 올바르지 않습니다';}
-  }).catch(function(e){toast('오류: '+e.message,'err');});
+    console.log('verifyTeacher response', res);
+    if(res.ok){teacherOk=true;cachedPw=pw;openTeacher();}
+    else{
+      document.getElementById('t-pw-err').textContent = res.error || '비밀번호가 올바르지 않습니다';
+    }
+  }).catch(function(e){
+    console.error('verifyTeacher error', e);
+    toast('오류: '+e.message,'err');
+  });
 }
 function openTeacher() {
   var today=kstDate();
