@@ -48,6 +48,8 @@ body{display:flex;justify-content:center;background-image:radial-gradient(ellips
 .btn-secondary:hover{border-color:var(--border-h);}
 .btn:disabled{opacity:0.45;cursor:not-allowed;}
 .btn:active:not(:disabled){transform:scale(0.98);}
+.slot-action-row{display:flex;gap:8px;}
+.slot-action-row button{flex:1;min-width:0;}
 
 .back-row{display:flex;align-items:center;gap:8px;}
 .back-btn{display:flex;align-items:center;gap:5px;background:none;border:none;color:var(--text-muted);font-family:'Noto Sans KR',sans-serif;font-size:13px;cursor:pointer;padding:6px 0;}
@@ -633,9 +635,9 @@ input[type="month"].form-input{font-family:var(--mono);color-scheme:dark;}
         </div>
       </div>
 
-      <div style="display:flex;gap:8px;">
-        <button class="btn btn-primary" onclick="saveSlotEdit()" style="flex:1">💾 저장</button>
-        <button class="btn btn-secondary" onclick="deleteCurrentSlot()" style="flex:1;color:var(--red);border-color:rgba(248,113,113,0.3)">🗑 삭제</button>
+      <div class="slot-action-row">
+        <button class="btn btn-primary" onclick="saveSlotEdit()">💾 저장</button>
+        <button class="btn btn-secondary" onclick="deleteCurrentSlot()" style="color:var(--red);border-color:rgba(248,113,113,0.3)">🗑 삭제</button>
       </div>
     </div>
   </div>
@@ -952,6 +954,19 @@ function applyRecord(ex) {
   document.getElementById('edit-banner').style.display='flex';
   document.getElementById('edit-banner-text').textContent=fmtDate(curDate)+' 기록을 수정합니다';
   document.getElementById('f-submit').textContent='✎ 수정하기';
+}
+
+function openForm() {
+  document.getElementById('f-num').textContent=curStu.num+'번';
+  document.getElementById('f-name').textContent=curStu.name;
+  document.getElementById('f-date').textContent=fmtDate(curDate);
+  updateSelDateUI();
+  clearForm();
+  showView('v-form');
+  api({action:'getRecords',date:curDate}).then(function(recs){
+    var ex=(recs||[]).find(function(r){return String(r.num)===String(curStu.num);});
+    if(ex) applyRecord(ex);
+  }).catch(function(){});
 }
 
 function reloadFormForDate() {
