@@ -555,6 +555,7 @@ input[type="month"].form-input{font-family:var(--mono);color-scheme:dark;}
       <input type="hidden" id="f-out">
       <div style="height:14px"></div>
       <button class="btn btn-primary" id="f-submit" onclick="submitRecord()">✓ 제출하기</button>
+      <button class="btn btn-secondary" style="margin-top:10px" onclick="openMyStats()">📊 내 공부 분석 보기</button>
     </div>
 
     <!-- 패널2: 슬롯 편집기 -->
@@ -656,7 +657,7 @@ input[type="month"].form-input{font-family:var(--mono);color-scheme:dark;}
 <!-- 학생 내 기록 분석 -->
 <div id="v-mystats" class="view">
   <div class="back-row">
-    <button class="back-btn" onclick="showView('v-ok')">
+    <button class="back-btn" onclick="closeMyStats()">
       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 3L5 8l5 5"/></svg>뒤로
     </button>
     <span style="font-size:13px;font-weight:700;color:var(--accent)" id="mystats-title"></span>
@@ -774,6 +775,7 @@ input[type="month"].form-input{font-family:var(--mono);color-scheme:dark;}
 var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyt7mre-1Lw4bw2Duj78YTXKB2OPsu3QzXg_bR0s2D_bJ8eC6Ioqksadkn8d4nFqtk_RQ/exec';
 
 var students = [], curDate = '', curStu = null, teacherOk = false, cachedPw = '';
+var prevViewBeforeMyStats = 'v-form';
 var DAYS = ['일','월','화','수','목','금','토'];
 var DAYS_FULL = ['일요일','월요일','화요일','수요일','목요일','금요일','토요일'];
 
@@ -1771,72 +1773,52 @@ function parseSlots(content) {
 
 function openMyStats() {
   if(!curStu) return;
-  document.getElementById('mystats-title').textContent = curStu.name + ' · 이번달 공부 기록';
-  document.getElementById('mystats-content').innerHTML = '<div class="loading-wrap"><div class="spinner"></div>불러오는 중…</div>';
+  var activeView = document.querySelector('.view.active');
+  prevViewBeforeMyStats = activeView ? activeView.id : 'v-form';
+  document.getElementById('mystats-title').textContent = curStu.name + ' · 내 공부 분석';
+  document.getElementById('mystats-content').innerHTML =
+    '<div class="tab-bar" style="margin-bottom:16px;">' +
+      '<button class="tab-btn active" id="my-tab-daily" onclick="switchMyStatsTab(\'daily\')">📅 일별</button>' +
+      '<button class="tab-btn" id="my-tab-weekly" onclick="switchMyStatsTab(\'weekly\')">📆 주별</button>' +
+      '<button class="tab-btn" id="my-tab-monthly" onclick="switchMyStatsTab(\'monthly\')">📊 월별</button>' +
+      '<button class="tab-btn" id="my-tab-subject" onclick="switchMyStatsTab(\'subject\')">📚 과목별</button>' +
+    '</div>' +
+    '<div id="mystats-tab-area"><div class="loading-wrap"><div class="spinner"></div>불러오는 중…</div></div>';
   showView('v-mystats');
+  switchMyStatsTab('daily');
+}
 
-  var today = kstDate();
-  var monthStart = today.slice(0,7) + '-01';
-  api({action:'getRecordsRange', start:monthStart, end:today}).then(function(recs){
-    recs = (recs||[]).filter(function(r){return r.num == curStu.num;}).sort(function(a,b){return b.date.localeCompare(a.date);});
+function closeMyStats() {
+  showView(prevViewBeforeMyStats || 'v-form');
+}
 
-    // 과목별 카운트
-    var subjCount = {}, subjMin = {};
-    SUBJ_META.forEach(function(s){subjCount[s.key]=0; subjMin[s.key]=0;});
+function switchMyStatsTab(tab) {
+  ['daily','weekly','monthly','subject'].forEach(function(name){
+    var btn=document.getElementById('my-tab-'+name);
+    if(btn) btn.classList.toggle('active', name===tab);
+  });
+  if(tab==='daily') loadMyStatsDaily();
+  else if(tab==='weekly') loadMyStatsWeekly();
+  else if(tab==='monthly') loadMyStatsMonthly();
+  else if(tab==='subject') loadMyStatsSubject();
+}
 
-    var totalMin = 0;
-    recs.forEach(function(r){
-      var slots = parseSlots(r.content);
-      var slotMin = slots.length ? slots.reduce(function(sum,s){return sum+Math.max(0,calcDurMin(s.start,s.end));},0)
-                                 : Math.max(0,calcDurMin(r.checkin,r.checkout));
-      totalMin += slotMin;
-      var parsed = parseSubjects(r.content);
-      SUBJ_META.forEach(function(s){
-        if(parsed[s.key] !== undefined) {
-          subjCount[s.key]++;
-          var sm = parsed[s.key].min || 0;
-          subjMin[s.key] += sm > 0 ? sm : (slotMin / Math.max(1,Object.keys(parsed).length));
-        }
-      });
-    });
-
-    var maxCount = Math.max.apply(null, SUBJ_META.map(function(s){return subjMin[s.key];})) || 1;
-    var th = Math.floor(totalMin/60), tm = totalMin%60;
-
-    var html = '';
-
-    // 요약 카드
-    html += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;">' +
-      '<div style="text-align:center;background:rgba(255,255,255,0.04);border-radius:10px;padding:10px 4px;">' +
-        '<div style="font-size:20px;font-weight:900;color:var(--green)">' + th + 'h ' + tm + 'm</div>' +
-        '<div style="font-size:10px;color:var(--text-muted)">총 자습시간</div></div>' +
-      '<div style="text-align:center;background:rgba(255,255,255,0.04);border-radius:10px;padding:10px 4px;">' +
-        '<div style="font-size:20px;font-weight:900;color:var(--blue)">' + recs.length + '일</div>' +
-        '<div style="font-size:10px;color:var(--text-muted)">자습 출석</div></div>' +
-      '<div style="text-align:center;background:rgba(255,255,255,0.04);border-radius:10px;padding:10px 4px;">' +
-        '<div style="font-size:20px;font-weight:900;color:var(--accent)">' + (recs.length?Math.round(totalMin/recs.length):0) + 'm</div>' +
-        '<div style="font-size:10px;color:var(--text-muted)">일평균</div></div>' +
-    '</div>';
-
-    // 과목별 참여 횟수 바 차트
-    html += '<div class="my-section-title">과목별 공부 횟수 (이번달)</div>';
-    SUBJ_META.forEach(function(s){
-      var pct = Math.round(subjMin[s.key] / maxCount * 100);
-      var sh=Math.floor(subjMin[s.key]/60), sm=Math.round(subjMin[s.key]%60);
-      var valStr = subjMin[s.key]>0 ? (sh?sh+'h ':'')+sm+'m' : '0m';
-      html += '<div class="subj-bar-row">' +
-        '<span class="subj-bar-label ' + s.id + '">' + s.key + '</span>' +
-        '<div class="subj-bar-wrap"><div class="subj-bar-fill" style="width:' + pct + '%;background:' + s.color + '"></div></div>' +
-        '<span class="subj-bar-val">' + valStr + '</span>' +
-      '</div>';
-    });
-
-    // 최근 기록 상세
-    html += '<div class="my-section-title">최근 공부 기록</div>';
-    if(recs.length === 0) {
-      html += '<div style="color:var(--text-muted);font-size:13px;text-align:center;padding:16px">이번달 기록이 없습니다</div>';
+function loadMyStatsDaily(date) {
+  date = date || kstDate();
+  var area = document.getElementById('mystats-tab-area');
+  area.innerHTML =
+    '<div class="card" style="padding:16px;margin-bottom:14px;">' +
+      '<label class="form-label">날짜 선택</label>' +
+      '<input type="date" class="form-input" id="my-date" value="' + date + '" onchange="loadMyStatsDaily(this.value)">' +
+    '</div>' +
+    '<div id="my-daily-content"><div class="loading-wrap"><div class="spinner"></div>불러오는 중…</div></div>';
+  api({action:'getRecords',date:date}).then(function(recs){
+    recs = (recs||[]).filter(function(r){return String(r.num)===String(curStu.num);});
+    var html='';
+    if(!recs.length) {
+      html = '<div style="color:var(--text-muted);font-size:13px;text-align:center;padding:16px">해당 날짜에 기록이 없습니다.</div>';
     } else {
-      recs.slice(0,10).forEach(function(r){
+      recs.forEach(function(r){
         var dur = Math.max(0, calcDurMin(r.checkin, r.checkout));
         var h = Math.floor(dur/60), m = dur%60;
         var parsed = parseSubjects(r.content);
@@ -1844,21 +1826,149 @@ function openMyStats() {
           '<div class="my-rec-date">' + r.date + '</div>' +
           '<div class="my-rec-time">⏱ ' + r.checkin + ' ~ ' + r.checkout + ' (' + h + 'h ' + m + 'm)</div>' +
           '<div>';
-        SUBJ_META.forEach(function(s){
-          if(parsed[s.key] !== undefined) {
-            html += '<div style="margin-bottom:4px">' +
-              '<span class="subj-tag ' + s.id + '">' + s.key + '</span>' +
-              '<span class="subj-content-text">' + (parsed[s.key]||'기록 없음') + '</span>' +
-            '</div>';
-          }
+        Object.keys(parsed).forEach(function(key){
+          var item = parsed[key];
+          html += '<div style="margin-bottom:4px">' +
+            '<span class="subj-tag">' + key + '</span>' +
+            '<span class="subj-content-text">' + (item.text || '기록 없음') + '</span>' +
+          '</div>';
         });
         html += '</div></div>';
       });
     }
-
-    document.getElementById('mystats-content').innerHTML = html;
+    document.getElementById('my-daily-content').innerHTML = html;
   }).catch(function(e){
-    document.getElementById('mystats-content').innerHTML = '<div style="color:var(--red);padding:16px">오류: ' + e.message + '</div>';
+    document.getElementById('my-daily-content').innerHTML = '<div style="color:var(--red);padding:16px">오류: '+e.message+'</div>';
+  });
+}
+
+function loadMyStatsWeekly(date) {
+  date = date || kstDate();
+  var d = new Date(date+'T00:00:00');
+  var dow = d.getDay();
+  var diff = dow === 0 ? -6 : 1 - dow;
+  var start = new Date(d); start.setDate(d.getDate() + diff);
+  var end = new Date(start); end.setDate(start.getDate() + 6);
+  var startStr = start.getFullYear()+'-'+pad(start.getMonth()+1)+'-'+pad(start.getDate());
+  var endStr = end.getFullYear()+'-'+pad(end.getMonth()+1)+'-'+pad(end.getDate());
+  var area = document.getElementById('mystats-tab-area');
+  area.innerHTML =
+    '<div class="card" style="padding:16px;margin-bottom:14px;">' +
+      '<label class="form-label">기준 날짜</label>' +
+      '<input type="date" class="form-input" id="my-week-date" value="' + date + '" onchange="loadMyStatsWeekly(this.value)">' +
+      '<div style="font-size:11px;color:var(--text-muted);margin-top:6px">기간: ' + startStr + ' ~ ' + endStr + '</div>' +
+    '</div>' +
+    '<div id="my-weekly-content"><div class="loading-wrap"><div class="spinner"></div>불러오는 중…</div></div>';
+  api({action:'getRecordsRange',start:startStr,end:endStr}).then(function(recs){
+    recs = (recs||[]).filter(function(r){return String(r.num)===String(curStu.num);}).sort(function(a,b){return b.date.localeCompare(a.date);});
+    if(!recs.length) {
+      document.getElementById('my-weekly-content').innerHTML = '<div style="color:var(--text-muted);font-size:13px;text-align:center;padding:16px">해당 주에 기록이 없습니다.</div>';
+      return;
+    }
+    var total = 0;
+    var html = '';
+    recs.forEach(function(r){
+      var dur = Math.max(0, calcDurMin(r.checkin, r.checkout));
+      total += dur;
+      var h = Math.floor(dur/60), m = dur%60;
+      html += '<div class="my-rec-item">' +
+        '<div class="my-rec-date">' + r.date + '</div>' +
+        '<div class="my-rec-time">⏱ ' + r.checkin + ' ~ ' + r.checkout + ' (' + h + 'h ' + m + 'm)</div>' +
+      '</div>';
+    });
+    var th = Math.floor(total/60), tm = total%60;
+    document.getElementById('my-weekly-content').innerHTML =
+      '<div class="stats-bar" style="margin-bottom:14px">' +
+        '<div class="stat-box"><div class="stat-num c-accent">' + th + 'h ' + tm + 'm</div><div class="stat-label">총 시간</div></div>' +
+        '<div class="stat-box"><div class="stat-num c-green">' + recs.length + '</div><div class="stat-label">기록일</div></div>' +
+      '</div>' + html;
+  }).catch(function(e){
+    document.getElementById('my-weekly-content').innerHTML = '<div style="color:var(--red);padding:16px">오류: '+e.message+'</div>';
+  });
+}
+
+function loadMyStatsMonthly(month) {
+  month = month || kstDate().slice(0,7);
+  var start = month + '-01';
+  var d = new Date(month + '-01T00:00:00');
+  var last = new Date(d.getFullYear(), d.getMonth()+1, 0);
+  var end = last.getFullYear() + '-' + pad(last.getMonth()+1) + '-' + pad(last.getDate());
+  var area = document.getElementById('mystats-tab-area');
+  area.innerHTML =
+    '<div class="card" style="padding:16px;margin-bottom:14px;">' +
+      '<label class="form-label">월 선택</label>' +
+      '<input type="month" class="form-input" id="my-month" value="' + month + '" onchange="loadMyStatsMonthly(this.value)">' +
+    '</div>' +
+    '<div id="my-monthly-content"><div class="loading-wrap"><div class="spinner"></div>불러오는 중…</div></div>';
+  api({action:'getRecordsRange',start:start,end:end}).then(function(recs){
+    recs = (recs||[]).filter(function(r){return String(r.num)===String(curStu.num);}).sort(function(a,b){return b.date.localeCompare(a.date);});
+    if(!recs.length) {
+      document.getElementById('my-monthly-content').innerHTML = '<div style="color:var(--text-muted);font-size:13px;text-align:center;padding:16px">해당 월에 기록이 없습니다.</div>';
+      return;
+    }
+    var total=0;
+    var html = '';
+    recs.forEach(function(r){var dur=Math.max(0,calcDurMin(r.checkin,r.checkout)); total+=dur; var h=Math.floor(dur/60), m=dur%60; html += '<div class="my-rec-item"><div class="my-rec-date">'+r.date+'</div><div class="my-rec-time">⏱ '+r.checkin+' ~ '+r.checkout+' ('+h+'h '+m+'m)</div></div>';});
+    var th = Math.floor(total/60), tm = total%60;
+    document.getElementById('my-monthly-content').innerHTML =
+      '<div class="stats-bar" style="margin-bottom:14px">' +
+        '<div class="stat-box"><div class="stat-num c-accent">' + th + 'h ' + tm + 'm</div><div class="stat-label">총 시간</div></div>' +
+        '<div class="stat-box"><div class="stat-num c-green">' + recs.length + '</div><div class="stat-label">기록일</div></div>' +
+      '</div>' + html;
+  }).catch(function(e){
+    document.getElementById('my-monthly-content').innerHTML = '<div style="color:var(--red);padding:16px">오류: '+e.message+'</div>';
+  });
+}
+
+function loadMyStatsSubject(month) {
+  month = month || kstDate().slice(0,7);
+  var start = month + '-01';
+  var d = new Date(month + '-01T00:00:00');
+  var last = new Date(d.getFullYear(), d.getMonth()+1, 0);
+  var end = last.getFullYear() + '-' + pad(last.getMonth()+1) + '-' + pad(last.getDate());
+  var area = document.getElementById('mystats-tab-area');
+  area.innerHTML =
+    '<div class="card" style="padding:16px;margin-bottom:14px;">' +
+      '<label class="form-label">월 선택</label>' +
+      '<input type="month" class="form-input" id="my-subj-month" value="' + month + '" onchange="loadMyStatsSubject(this.value)">' +
+    '</div>' +
+    '<div id="my-subject-content"><div class="loading-wrap"><div class="spinner"></div>불러오는 중…</div></div>';
+  api({action:'getRecordsRange',start:start,end:end}).then(function(recs){
+    recs = (recs||[]).filter(function(r){return String(r.num)===String(curStu.num);});
+    if(!recs.length) {
+      document.getElementById('my-subject-content').innerHTML = '<div style="color:var(--text-muted);font-size:13px;text-align:center;padding:16px">해당 월에 기록이 없습니다.</div>';
+      return;
+    }
+    var subjMin = {};
+    SUBJ_META.forEach(function(s){subjMin[s.key]=0;});
+    var total=0;
+    recs.forEach(function(r){
+      var slots=parseSlots(r.content);
+      var slotMin = slots.length ? slots.reduce(function(sum,s){return sum+Math.max(0,calcDurMin(s.start,s.end));},0)
+                                 : Math.max(0,calcDurMin(r.checkin,r.checkout));
+      total += slotMin;
+      var parsed=parseSubjects(r.content);
+      SUBJ_META.forEach(function(s){
+        if(parsed[s.key] !== undefined) {
+          var sm = parsed[s.key].min || 0;
+          subjMin[s.key] += sm > 0 ? sm : (slotMin / Math.max(1,Object.keys(parsed).length));
+        }
+      });
+    });
+    var maxVal = Math.max.apply(null, SUBJ_META.map(function(s){return subjMin[s.key];})) || 1;
+    var html = '<div class="my-section-title">과목별 시간 분포</div>';
+    SUBJ_META.forEach(function(s){
+      var pct = Math.round(subjMin[s.key]/maxVal*100);
+      var sh = Math.floor(subjMin[s.key]/60), sm = Math.round(subjMin[s.key]%60);
+      html += '<div class="subj-bar-row">' +
+        '<span class="subj-bar-label ' + s.id + '">' + s.key + '</span>' +
+        '<div class="subj-bar-wrap"><div class="subj-bar-fill" style="width:' + pct + '%;background:' + s.color + '"></div></div>' +
+        '<span class="subj-bar-val">' + (subjMin[s.key] > 0 ? (sh?sh+'h ':'') + sm + 'm' : '0m') + '</span>' +
+      '</div>';
+    });
+    document.getElementById('my-subject-content').innerHTML = html;
+  }).catch(function(e){
+    document.getElementById('my-subject-content').innerHTML = '<div style="color:var(--red);padding:16px">오류: '+e.message+'</div>';
   });
 }
 
