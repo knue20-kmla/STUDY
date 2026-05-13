@@ -2107,4 +2107,26 @@ function deserializeSlots(raw) {
   renderSlotCards();
 }
 
+window.goStudentSelect = goStudentSelect;
+window.goTeacherLogin = goTeacherLogin;
+window.onDateClick = onDateClick;
+window.openDatePicker = openDatePicker;
+window.changeFormDate = changeFormDate;
+window.goToday = goToday;
+window.addSlotAndEdit = addSlotAndEdit;
+window.submitRecord = submitRecord;
+window.clearEditorSubj = clearEditorSubj;
+window.doSetPw = doSetPw;
+window.doLoginPw = doLoginPw;
+window.showView = showView;
+window.addEventListener('load', function() {
+  initHome();
+  document.getElementById('date-hero').addEventListener('click', onDateClick);
+  document.getElementById('btn-student').addEventListener('click', goStudentSelect);
+  document.getElementById('btn-teacher').addEventListener('click', goTeacherLogin);
+});
+</script>
+</body>
+</html>
+
 
