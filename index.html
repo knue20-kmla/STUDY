@@ -449,7 +449,7 @@ input[type="month"].form-input{font-family:var(--mono);color-scheme:dark;}
       </div>
     </div>
   </div>
-  <div class="date-hero" onclick="onDateClick()">
+  <div class="date-hero" id="date-hero">
     <div class="date-hero-inner">
       <div>
         <div class="date-weekday" id="h-weekday"></div>
@@ -460,8 +460,8 @@ input[type="month"].form-input{font-family:var(--mono);color-scheme:dark;}
     </div>
   </div>
   <div style="display:flex;flex-direction:column;gap:10px;">
-    <button class="btn btn-primary" onclick="goStudentSelect()">📖 학생 자습 기록 입력</button>
-    <button class="btn btn-secondary" onclick="goTeacherLogin()">🔒 담임교사 확인</button>
+    <button class="btn btn-primary" id="btn-student">📖 학생 자습 기록 입력</button>
+    <button class="btn btn-secondary" id="btn-teacher">🔒 담임교사 확인</button>
   </div>
 </div>
 
@@ -1543,7 +1543,12 @@ function closeWeekDetail() {
   document.getElementById('week-detail-modal').style.display = 'none';
 }
 
-window.addEventListener('load', initHome);
+window.addEventListener('load', function() {
+  initHome();
+  document.getElementById('date-hero').addEventListener('click', onDateClick);
+  document.getElementById('btn-student').addEventListener('click', goStudentSelect);
+  document.getElementById('btn-teacher').addEventListener('click', goTeacherLogin);
+});
 
 // ── 커스텀 시간 피커 ──
 var tpickerState = {in:{h:-1,m:-1}, out:{h:-1,m:-1}};
