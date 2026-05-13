@@ -1011,7 +1011,8 @@ function openTeacher() {
   document.getElementById('w-date').value=today;
   document.getElementById('m-month').value=today.slice(0,7);
   document.getElementById('a-start').value=today.slice(0,7)+'-01';
-  if(!document.getElementById('time-slot-list').children.length) initTimeSlots([]);
+  var timeSlotListEl = document.getElementById('time-slot-list');
+  if (timeSlotListEl && !timeSlotListEl.children.length) initTimeSlots([]);
   document.getElementById('a-end').value=today;
   showView('v-teacher');
   loadDaily();
