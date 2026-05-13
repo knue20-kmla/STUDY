@@ -76,6 +76,9 @@ body{display:flex;justify-content:center;background-image:radial-gradient(ellips
 .form-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow);}
 textarea.form-input{resize:vertical;min-height:110px;font-size:14px;line-height:1.6;}
 input[type="time"].form-input{font-family:var(--mono);font-size:18px;font-weight:600;color-scheme:dark;} input[type="time"].tpick-native{font-family:var(--mono);font-size:18px;font-weight:600;color-scheme:dark;}
+input[type="time"]::-webkit-datetime-edit-ampm-field { display: none; }
+input[type="time"]::-webkit-datetime-edit-ampm-field { display: none !important; }
+input[type="time"]::-webkit-calendar-picker-indicator { filter: invert(1); }
 input[type="date"].form-input{font-family:var(--mono);color-scheme:dark;}
 input[type="month"].form-input{font-family:var(--mono);color-scheme:dark;}
 .time-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
@@ -571,9 +574,9 @@ input[type="month"].form-input{font-family:var(--mono);color-scheme:dark;}
       <div class="form-group">
         <label class="form-label">시작 ~ 끝 시간</label>
         <div style="display:flex;align-items:center;gap:10px;">
-          <input type="time" id="fe-start" style="flex:1;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:10px;color:var(--text);font-size:18px;font-weight:700;font-family:var(--mono),monospace;color-scheme:dark;cursor:pointer;" onclick="try{this.showPicker()}catch(e){}" onchange="onEditorTimeChange()">
+          <input type="time" id="fe-start" step="60" style="flex:1;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:10px;color:var(--text);font-size:18px;font-weight:700;font-family:var(--mono),monospace;color-scheme:dark;cursor:pointer;" onclick="try{this.showPicker()}catch(e){}" onchange="onEditorTimeChange()">
           <span style="color:var(--text-muted);font-size:18px">~</span>
-          <input type="time" id="fe-end" style="flex:1;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:10px;color:var(--text);font-size:18px;font-weight:700;font-family:var(--mono),monospace;color-scheme:dark;cursor:pointer;" onclick="try{this.showPicker()}catch(e){}" onchange="onEditorTimeChange()">
+          <input type="time" id="fe-end" step="60" style="flex:1;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:10px;color:var(--text);font-size:18px;font-weight:700;font-family:var(--mono),monospace;color-scheme:dark;cursor:pointer;" onclick="try{this.showPicker()}catch(e){}" onchange="onEditorTimeChange()">
         </div>
         <div id="fe-duration" style="font-size:12px;color:var(--green);font-weight:700;margin-top:6px;"></div>
       </div>
@@ -588,7 +591,7 @@ input[type="month"].form-input{font-family:var(--mono);color-scheme:dark;}
             <div class="subj-col">
               <div style="display:flex;align-items:center;gap:6px;">
                 <select class="subj-time-sel" id="eft-kr" onchange="onEditorTimeChange()"><option value="0">-</option><option value="10">10분</option><option value="20">20분</option><option value="30">30분</option><option value="40">40분</option><option value="50">50분</option><option value="60">1시간</option><option value="70">1시간 10분</option><option value="80">1시간 20분</option><option value="90">1시간 30분</option><option value="100">1시간 40분</option><option value="110">1시간 50분</option><option value="120">2시간</option><option value="130">2시간 10분</option><option value="140">2시간 20분</option><option value="150">2시간 30분</option><option value="160">2시간 40분</option><option value="170">2시간 50분</option><option value="180">3시간</option><option value="190">3시간 10분</option><option value="200">3시간 20분</option><option value="210">3시간 30분</option><option value="220">3시간 40분</option><option value="230">3시간 50분</option><option value="240">4시간</option><option value="250">4시간 10분</option><option value="260">4시간 20분</option><option value="270">4시간 30분</option><option value="280">4시간 40분</option><option value="290">4시간 50분</option><option value="300">5시간</option></select>
-                <button class="time-slot-del" onclick="clearEditorSubj('kr')" style="flex-shrink:0">×</button>
+                <button class="time-slot-del" onclick="event.stopPropagation(); clearEditorSubj('kr'); return false;" style="flex-shrink:0">×</button>
               </div>
               <textarea class="subj-input" id="ef-kr" placeholder="국어 공부 내용" rows="1" oninput="autoResize(this)"></textarea>
             </div>
@@ -598,7 +601,7 @@ input[type="month"].form-input{font-family:var(--mono);color-scheme:dark;}
             <div class="subj-col">
               <div style="display:flex;align-items:center;gap:6px;">
                 <select class="subj-time-sel" id="eft-en" onchange="onEditorTimeChange()"><option value="0">-</option><option value="10">10분</option><option value="20">20분</option><option value="30">30분</option><option value="40">40분</option><option value="50">50분</option><option value="60">1시간</option><option value="70">1시간 10분</option><option value="80">1시간 20분</option><option value="90">1시간 30분</option><option value="100">1시간 40분</option><option value="110">1시간 50분</option><option value="120">2시간</option><option value="130">2시간 10분</option><option value="140">2시간 20분</option><option value="150">2시간 30분</option><option value="160">2시간 40분</option><option value="170">2시간 50분</option><option value="180">3시간</option><option value="190">3시간 10분</option><option value="200">3시간 20분</option><option value="210">3시간 30분</option><option value="220">3시간 40분</option><option value="230">3시간 50분</option><option value="240">4시간</option><option value="250">4시간 10분</option><option value="260">4시간 20분</option><option value="270">4시간 30분</option><option value="280">4시간 40분</option><option value="290">4시간 50분</option><option value="300">5시간</option></select>
-                <button class="time-slot-del" onclick="clearEditorSubj('en')" style="flex-shrink:0">×</button>
+                <button class="time-slot-del" onclick="event.stopPropagation(); clearEditorSubj('en'); return false;" style="flex-shrink:0">×</button>
               </div>
               <textarea class="subj-input" id="ef-en" placeholder="영어 공부 내용" rows="1" oninput="autoResize(this)"></textarea>
             </div>
@@ -608,7 +611,7 @@ input[type="month"].form-input{font-family:var(--mono);color-scheme:dark;}
             <div class="subj-col">
               <div style="display:flex;align-items:center;gap:6px;">
                 <select class="subj-time-sel" id="eft-ma" onchange="onEditorTimeChange()"><option value="0">-</option><option value="10">10분</option><option value="20">20분</option><option value="30">30분</option><option value="40">40분</option><option value="50">50분</option><option value="60">1시간</option><option value="70">1시간 10분</option><option value="80">1시간 20분</option><option value="90">1시간 30분</option><option value="100">1시간 40분</option><option value="110">1시간 50분</option><option value="120">2시간</option><option value="130">2시간 10분</option><option value="140">2시간 20분</option><option value="150">2시간 30분</option><option value="160">2시간 40분</option><option value="170">2시간 50분</option><option value="180">3시간</option><option value="190">3시간 10분</option><option value="200">3시간 20분</option><option value="210">3시간 30분</option><option value="220">3시간 40분</option><option value="230">3시간 50분</option><option value="240">4시간</option><option value="250">4시간 10분</option><option value="260">4시간 20분</option><option value="270">4시간 30분</option><option value="280">4시간 40분</option><option value="290">4시간 50분</option><option value="300">5시간</option></select>
-                <button class="time-slot-del" onclick="clearEditorSubj('ma')" style="flex-shrink:0">×</button>
+                <button class="time-slot-del" onclick="event.stopPropagation(); clearEditorSubj('ma'); return false;" style="flex-shrink:0">×</button>
               </div>
               <textarea class="subj-input" id="ef-ma" placeholder="수학 공부 내용" rows="1" oninput="autoResize(this)"></textarea>
             </div>
@@ -618,7 +621,7 @@ input[type="month"].form-input{font-family:var(--mono);color-scheme:dark;}
             <div class="subj-col">
               <div style="display:flex;align-items:center;gap:6px;">
                 <select class="subj-time-sel" id="eft-e1" onchange="onEditorTimeChange()"><option value="0">-</option><option value="10">10분</option><option value="20">20분</option><option value="30">30분</option><option value="40">40분</option><option value="50">50분</option><option value="60">1시간</option><option value="70">1시간 10분</option><option value="80">1시간 20분</option><option value="90">1시간 30분</option><option value="100">1시간 40분</option><option value="110">1시간 50분</option><option value="120">2시간</option><option value="130">2시간 10분</option><option value="140">2시간 20분</option><option value="150">2시간 30분</option><option value="160">2시간 40분</option><option value="170">2시간 50분</option><option value="180">3시간</option><option value="190">3시간 10분</option><option value="200">3시간 20분</option><option value="210">3시간 30분</option><option value="220">3시간 40분</option><option value="230">3시간 50분</option><option value="240">4시간</option><option value="250">4시간 10분</option><option value="260">4시간 20분</option><option value="270">4시간 30분</option><option value="280">4시간 40분</option><option value="290">4시간 50분</option><option value="300">5시간</option></select>
-                <button class="time-slot-del" onclick="clearEditorSubj('e1')" style="flex-shrink:0">×</button>
+                <button class="time-slot-del" onclick="event.stopPropagation(); clearEditorSubj('e1'); return false;" style="flex-shrink:0">×</button>
               </div>
               <textarea class="subj-input" id="ef-e1" placeholder="탐구1 공부 내용" rows="1" oninput="autoResize(this)"></textarea>
             </div>
@@ -628,7 +631,7 @@ input[type="month"].form-input{font-family:var(--mono);color-scheme:dark;}
             <div class="subj-col">
               <div style="display:flex;align-items:center;gap:6px;">
                 <select class="subj-time-sel" id="eft-e2" onchange="onEditorTimeChange()"><option value="0">-</option><option value="10">10분</option><option value="20">20분</option><option value="30">30분</option><option value="40">40분</option><option value="50">50분</option><option value="60">1시간</option><option value="70">1시간 10분</option><option value="80">1시간 20분</option><option value="90">1시간 30분</option><option value="100">1시간 40분</option><option value="110">1시간 50분</option><option value="120">2시간</option><option value="130">2시간 10분</option><option value="140">2시간 20분</option><option value="150">2시간 30분</option><option value="160">2시간 40분</option><option value="170">2시간 50분</option><option value="180">3시간</option><option value="190">3시간 10분</option><option value="200">3시간 20분</option><option value="210">3시간 30분</option><option value="220">3시간 40분</option><option value="230">3시간 50분</option><option value="240">4시간</option><option value="250">4시간 10분</option><option value="260">4시간 20분</option><option value="270">4시간 30분</option><option value="280">4시간 40분</option><option value="290">4시간 50분</option><option value="300">5시간</option></select>
-                <button class="time-slot-del" onclick="clearEditorSubj('e2')" style="flex-shrink:0">×</button>
+                <button class="time-slot-del" onclick="event.stopPropagation(); clearEditorSubj('e2'); return false;" style="flex-shrink:0">×</button>
               </div>
               <textarea class="subj-input" id="ef-e2" placeholder="탐구2 공부 내용" rows="1" oninput="autoResize(this)"></textarea>
             </div>
@@ -2121,6 +2124,21 @@ function openSlotEditor(id) {
 function onEditorTimeChange() {
   var s=document.getElementById('fe-start').value;
   var e=document.getElementById('fe-end').value;
+  
+  // 24시간 형식 강제
+  if(s) {
+    var startParts = s.split(':');
+    var startHour = parseInt(startParts[0]);
+    if(startHour < 10) startParts[0] = '0' + startHour;
+    document.getElementById('fe-start').value = startParts.join(':');
+  }
+  if(e) {
+    var endParts = e.split(':');
+    var endHour = parseInt(endParts[0]);
+    if(endHour < 10) endParts[0] = '0' + endHour;
+    document.getElementById('fe-end').value = endParts.join(':');
+  }
+  
   var dur = (s&&e) ? Math.max(0,calcDurMin(s,e)) : 0;
   var h=Math.floor(dur/60), m=dur%60;
   document.getElementById('fe-duration').textContent = dur>0?'이 시간대: '+(h?h+'시간 ':'' )+(m?m+'분':''):'';
@@ -2146,9 +2164,27 @@ function onEditorTimeChange() {
 }
 
 function clearEditorSubj(sid){
-  document.getElementById('eft-'+sid).value='0';
-  var ta=document.getElementById('ef-'+sid); ta.value=''; ta.style.height='36px';
-  onEditorTimeChange();
+  // 시간 선택 초기화
+  var sel = document.getElementById('eft-'+sid);
+  sel.value='0';
+  
+  // 텍스트 영역 초기화
+  var ta = document.getElementById('ef-'+sid);
+  ta.value = '';
+  ta.style.height = '36px';
+  
+  // 옵션 비활성화 해제 (시간 제한 로직 무시)
+  Array.from(sel.options).forEach(function(opt){
+    opt.disabled = false;
+  });
+  
+  // 약간 지연 후 변경사항 적용 (시간 제한 로직이 적용된 후)
+  setTimeout(function(){
+    onEditorTimeChange();
+  }, 10);
+  
+  // 시각적 피드백
+  toast('과목이 삭제되었습니다', 'info');
 }
 
 // ── 저장 ──
