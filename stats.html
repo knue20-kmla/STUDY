@@ -10,8 +10,8 @@
 <style>
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 :root {
-  --bg:#f8f9fa; --surface:#ffffff; --surface2:#f1f3f5;
-  --border:rgba(0,0,0,0.08); --border-h:rgba(0,0,0,0.12);
+  --bg:#e8eef5; --surface:#ffffff; --surface2:#f5f7fa;
+  --border:rgba(30,60,114,0.1); --border-h:rgba(30,60,114,0.2);
   --accent:#1e3c72; --accent-dim:rgba(30,60,114,0.08);
   --blue:#4a90e2; --green:#28a745; --red:#dc3545; --purple:#764ba2;
   --gold:#d4af37;
@@ -20,9 +20,8 @@
 }
 html,body { height: 100%; font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: var(--text); }
 body {
-  background-image:
-    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(30,60,114,0.03) 0%, transparent 60%),
-    radial-gradient(circle at 80% 20%, rgba(74,144,226,0.02) 0%, transparent 50%);
+  background: linear-gradient(135deg, #e8eef5 0%, #f0f4f8 50%, #e8eef5 100%);
+  background-attachment: fixed;
 }
 .container { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
 

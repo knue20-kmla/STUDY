@@ -1,19 +1,19 @@
 /* ═══════════════════════════════════════════════════════════════
    민족사관고등학교 Premium Design System
-   밝고 편안한 블루 톤 - 통합 대시보드와 통일
+   편안한 블루 배경 톤
    ═══════════════════════════════════════════════════════════════ */
 
-/* ── 색상 팔레트 재정의 (밝은 블루 톤) ── */
+/* ── 색상 팔레트 재정의 (편안한 블루 배경) ── */
 :root {
-  /* 베이스 - 밝은 톤 */
-  --bg: #f8f9fa;
+  /* 베이스 - 부드러운 블루 톤 배경 */
+  --bg: #e8eef5;
   --surface: #ffffff;
-  --surface2: #f1f3f5;
+  --surface2: #f5f7fa;
   --surface3: #e9ecef;
 
   /* 보더 */
-  --border: rgba(0,0,0,0.08);
-  --border-h: rgba(0,0,0,0.12);
+  --border: rgba(30,60,114,0.1);
+  --border-h: rgba(30,60,114,0.2);
 
   /* 액센트 - 블루 그라데이션 */
   --primary: #1e3c72;
@@ -27,7 +27,7 @@
   --gold: #d4af37;
   --gold-dim: rgba(212,175,55,0.1);
 
-  /* 텍스트 - 어두운 톤 */
+  /* 텍스트 */
   --text: #212529;
   --text-secondary: #495057;
   --text-muted: #6c757d;
@@ -39,9 +39,9 @@
   --info: #17a2b8;
 
   /* 그림자 */
-  --shadow-sm: 0 2px 4px rgba(0,0,0,0.08);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
-  --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+  --shadow-sm: 0 2px 4px rgba(30,60,114,0.08);
+  --shadow-md: 0 4px 12px rgba(30,60,114,0.1);
+  --shadow-lg: 0 8px 24px rgba(30,60,114,0.12);
 
   /* 반경 */
   --radius: 16px;
@@ -49,23 +49,21 @@
   --radius-lg: 20px;
 }
 
-/* ── 배경 개선 ── */
+/* ── 배경 개선 (부드러운 블루 톤) ── */
 body {
-  background: var(--bg) !important;
-  background-image:
-    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(30,60,114,0.03) 0%, transparent 60%),
-    radial-gradient(circle at 80% 20%, rgba(74,144,226,0.02) 0%, transparent 50%) !important;
+  background: linear-gradient(135deg, #e8eef5 0%, #f0f4f8 50%, #e8eef5 100%) !important;
+  background-attachment: fixed !important;
 }
 
-/* ── 헤더 고급화 ── */
+/* ── 헤더 개선 (블루 그라데이션) ── */
 .page-header {
   padding: 40px 0 32px !important;
   text-align: center;
   position: relative;
-  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-  margin: -16px -16px 24px -16px;
-  border-radius: 0 0 24px 24px;
-  box-shadow: var(--shadow-md);
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important;
+  margin: -16px -16px 24px -16px !important;
+  border-radius: 0 0 24px 24px !important;
+  box-shadow: 0 4px 16px rgba(30,60,114,0.15) !important;
 }
 
 .page-header::after {
@@ -87,7 +85,7 @@ body {
   font-size: 11px !important;
   font-weight: 600 !important;
   letter-spacing: 0.15em !important;
-  color: rgba(255,255,255,0.9) !important;
+  color: rgba(255,255,255,0.95) !important;
   text-transform: uppercase !important;
   margin-bottom: 12px !important;
 }
@@ -97,7 +95,7 @@ body {
   content: '' !important;
   width: 24px !important;
   height: 1px !important;
-  background: rgba(255,255,255,0.4) !important;
+  background: rgba(255,255,255,0.5) !important;
 }
 
 .page-header h1 {
@@ -108,12 +106,12 @@ body {
   background: none !important;
   -webkit-text-fill-color: white !important;
   margin-bottom: 8px !important;
-  text-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  text-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
 }
 
 .page-header p {
   font-size: 14px !important;
-  color: rgba(255,255,255,0.85) !important;
+  color: rgba(255,255,255,0.9) !important;
   font-weight: 400 !important;
 }
 
