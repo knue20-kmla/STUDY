@@ -98,6 +98,14 @@ body { background-image: radial-gradient(ellipse 60% 40% at 50% -10%, rgba(102,1
     <button onclick="loadStats()">조회</button>
   </div>
 
+  <div class="date-picker">
+    <label>👤 학생 선택:</label>
+    <select id="student-select" onchange="toggleStudentStats()" style="padding: 8px 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 14px; min-width: 150px;">
+      <option value="">전체 학급</option>
+    </select>
+    <span style="color: var(--text-muted); font-size: 12px;">개인 통계를 보려면 학생을 선택하세요</span>
+  </div>
+
   <div id="loading" class="loading">
     <div class="spinner"></div>
     <p style="margin-top: 16px;">데이터를 불러오는 중...</p>
@@ -153,11 +161,69 @@ body { background-image: radial-gradient(ellipse 60% 40% at 50% -10%, rgba(102,1
     </div>
 
     <!-- 학생별 순위 차트 -->
-    <div class="chart-section">
+    <div class="chart-section" id="class-stats">
       <div class="chart-card">
         <div class="chart-title">👥 학생별 총 공부 시간</div>
         <div class="chart-container">
           <canvas id="student-chart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- 개인별 상세 통계 -->
+    <div id="individual-stats" style="display: none;">
+      <div style="text-align: center; margin: 32px 0;">
+        <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 8px;">
+          <span id="student-name-title"></span>님의 자습 통계
+        </h2>
+        <p style="color: var(--text-muted); font-size: 14px;">개인별 상세 분석</p>
+      </div>
+
+      <!-- 개인 요약 카드 -->
+      <div class="stats-grid" style="margin-bottom: 32px;">
+        <div class="stat-card">
+          <div class="stat-icon">📅</div>
+          <div class="stat-label">출석 일수</div>
+          <div class="stat-value" id="ind-attendance">0일</div>
+          <div class="stat-sub" id="ind-attendance-sub"></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">⏱️</div>
+          <div class="stat-label">총 공부 시간</div>
+          <div class="stat-value" id="ind-total-time">0시간</div>
+          <div class="stat-sub" id="ind-total-sub"></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📊</div>
+          <div class="stat-label">하루 평균</div>
+          <div class="stat-value" id="ind-avg-time">0분</div>
+          <div class="stat-sub" id="ind-avg-sub"></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🏆</div>
+          <div class="stat-label">학급 순위</div>
+          <div class="stat-value" id="ind-rank">-</div>
+          <div class="stat-sub" id="ind-rank-sub"></div>
+        </div>
+      </div>
+
+      <!-- 개인 과목별 차트 -->
+      <div class="chart-section">
+        <div class="chart-card">
+          <div class="chart-title">📖 과목별 공부 시간 (개인)</div>
+          <div class="chart-container">
+            <canvas id="ind-subject-chart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- 개인 일별 추이 -->
+      <div class="chart-section">
+        <div class="chart-card">
+          <div class="chart-title">📈 일별 공부 시간 추이 (개인)</div>
+          <div class="chart-container">
+            <canvas id="ind-daily-chart"></canvas>
+          </div>
         </div>
       </div>
     </div>
@@ -166,6 +232,8 @@ body { background-image: radial-gradient(ellipse 60% 40% at 50% -10%, rgba(102,1
 
 <script>
 var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyt7mre-1Lw4bw2Duj78YTXKB2OPsu3QzXg_bR0s2D_bJ8eC6Ioqksadkn8d4nFqtk_RQ/exec';
+var allRecords = [];
+var allStudents = [];
 
 // 한국 시간 날짜
 function kstDate() {
@@ -185,8 +253,27 @@ window.onload = function() {
   document.getElementById('end-date').value = today;
   document.getElementById('start-date').value = startStr;
 
+  // 학생 목록 로드
+  loadStudents();
   loadStats();
 };
+
+// 학생 목록 로드
+function loadStudents() {
+  fetch(SCRIPT_URL + '?action=getStudents')
+    .then(res => res.json())
+    .then(students => {
+      allStudents = students;
+      var select = document.getElementById('student-select');
+      students.forEach(s => {
+        var option = document.createElement('option');
+        option.value = s.name;
+        option.textContent = s.num + '. ' + s.name;
+        select.appendChild(option);
+      });
+    })
+    .catch(err => console.error('학생 목록 로드 실패:', err));
+}
 
 // 통계 로드
 function loadStats() {
@@ -204,7 +291,15 @@ function loadStats() {
   fetch(SCRIPT_URL + '?action=getRecordsRange&start=' + start + '&end=' + end)
     .then(res => res.json())
     .then(records => {
-      processStats(records);
+      allRecords = records;
+      var selectedStudent = document.getElementById('student-select').value;
+
+      if (selectedStudent) {
+        processIndividualStats(records, selectedStudent);
+      } else {
+        processStats(records);
+      }
+
       document.getElementById('loading').style.display = 'none';
       document.getElementById('content').style.display = 'block';
     })
@@ -215,63 +310,15 @@ function loadStats() {
     });
 }
 
-// 통계 처리 및 차트 생성
-function processStats(records) {
-  // 기본 통계
-  var totalRecords = records.length;
-  var totalMinutes = 0;
-  var uniqueDates = new Set();
-  var subjectTime = { 국어: 0, 영어: 0, 수학: 0, 과학: 0, 사회: 0, 기타: 0 };
-  var studentTime = {};
-  var dailyTime = {};
+// 학생 선택 변경
+function toggleStudentStats() {
+  var selectedStudent = document.getElementById('student-select').value;
 
-  records.forEach(r => {
-    if (r.checkin && r.checkout) {
-      var mins = calcDuration(r.checkin, r.checkout);
-      totalMinutes += mins;
-      uniqueDates.add(r.date);
-
-      // 학생별
-      if (!studentTime[r.name]) studentTime[r.name] = 0;
-      studentTime[r.name] += mins;
-
-      // 일별
-      if (!dailyTime[r.date]) dailyTime[r.date] = 0;
-      dailyTime[r.date] += mins;
-
-      // 과목별 파싱
-      if (r.content) {
-        var subjects = parseSubjects(r.content);
-        Object.keys(subjects).forEach(subj => {
-          if (subjectTime[subj] !== undefined) {
-            subjectTime[subj] += subjects[subj];
-          } else {
-            subjectTime['기타'] += subjects[subj];
-          }
-        });
-      }
-    }
-  });
-
-  var avgMinutes = totalRecords > 0 ? Math.round(totalMinutes / totalRecords) : 0;
-  var totalDays = uniqueDates.size;
-  var totalHours = Math.round(totalMinutes / 60);
-  var attendanceRate = totalRecords > 0 ? Math.round((totalRecords / (totalDays * 14)) * 100) : 0;
-
-  // 요약 카드 업데이트
-  document.getElementById('attendance-rate').textContent = attendanceRate + '%';
-  document.getElementById('attendance-sub').textContent = totalRecords + '건 기록';
-  document.getElementById('avg-study-time').textContent = avgMinutes + '분';
-  document.getElementById('time-sub').textContent = '1인당 평균';
-  document.getElementById('total-days').textContent = totalDays + '일';
-  document.getElementById('days-sub').textContent = '자습 일수';
-  document.getElementById('total-hours').textContent = totalHours + '시간';
-  document.getElementById('hours-sub').textContent = '전체 합계';
-
-  // 차트 생성
-  createSubjectChart(subjectTime);
-  createDailyChart(dailyTime);
-  createStudentChart(studentTime);
+  if (selectedStudent) {
+    processIndividualStats(allRecords, selectedStudent);
+  } else {
+    processStats(allRecords);
+  }
 }
 
 // 시간 계산
@@ -395,6 +442,206 @@ function createStudentChart(data) {
         backgroundColor: 'rgba(102,126,234,0.7)',
         borderColor: '#667eea',
         borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          labels: { color: '#e2e8f0', font: { family: 'Noto Sans KR' } }
+        }
+      },
+      scales: {
+        x: { ticks: { color: '#64748b' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+        y: { ticks: { color: '#64748b' }, grid: { color: 'rgba(255,255,255,0.05)' } }
+      }
+    }
+  });
+}
+
+// 개인별 통계 처리
+function processIndividualStats(records, studentName) {
+  // UI 전환
+  document.getElementById('class-stats').style.display = 'none';
+  document.getElementById('individual-stats').style.display = 'block';
+  document.getElementById('student-name-title').textContent = studentName;
+
+  // 해당 학생 기록만 필터링
+  var studentRecords = records.filter(r => r.name === studentName);
+
+  // 전체 학생별 시간 계산 (순위용)
+  var allStudentTime = {};
+  records.forEach(r => {
+    if (r.checkin && r.checkout) {
+      var mins = calcDuration(r.checkin, r.checkout);
+      if (!allStudentTime[r.name]) allStudentTime[r.name] = 0;
+      allStudentTime[r.name] += mins;
+    }
+  });
+
+  // 순위 계산
+  var sorted = Object.entries(allStudentTime).sort((a, b) => b[1] - a[1]);
+  var rank = sorted.findIndex(s => s[0] === studentName) + 1;
+  var totalStudents = sorted.length;
+
+  // 개인 통계 계산
+  var totalMinutes = 0;
+  var uniqueDates = new Set();
+  var subjectTime = { 국어: 0, 영어: 0, 수학: 0, 과학: 0, 사회: 0, 기타: 0 };
+  var dailyTime = {};
+
+  studentRecords.forEach(r => {
+    if (r.checkin && r.checkout) {
+      var mins = calcDuration(r.checkin, r.checkout);
+      totalMinutes += mins;
+      uniqueDates.add(r.date);
+
+      // 일별
+      if (!dailyTime[r.date]) dailyTime[r.date] = 0;
+      dailyTime[r.date] += mins;
+
+      // 과목별
+      if (r.content) {
+        var subjects = parseSubjects(r.content);
+        Object.keys(subjects).forEach(subj => {
+          if (subjectTime[subj] !== undefined) {
+            subjectTime[subj] += subjects[subj];
+          } else {
+            subjectTime['기타'] += subjects[subj];
+          }
+        });
+      }
+    }
+  });
+
+  var attendanceDays = uniqueDates.size;
+  var totalHours = Math.round(totalMinutes / 60);
+  var avgMinutes = attendanceDays > 0 ? Math.round(totalMinutes / attendanceDays) : 0;
+
+  // 요약 카드 업데이트
+  document.getElementById('ind-attendance').textContent = attendanceDays + '일';
+  document.getElementById('ind-attendance-sub').textContent = studentRecords.length + '건 기록';
+  document.getElementById('ind-total-time').textContent = totalHours + '시간';
+  document.getElementById('ind-total-sub').textContent = totalMinutes + '분';
+  document.getElementById('ind-avg-time').textContent = avgMinutes + '분';
+  document.getElementById('ind-avg-sub').textContent = '하루 평균';
+  document.getElementById('ind-rank').textContent = rank + '등';
+  document.getElementById('ind-rank-sub').textContent = '전체 ' + totalStudents + '명 중';
+
+  // 차트 생성
+  createIndSubjectChart(subjectTime);
+  createIndDailyChart(dailyTime);
+}
+
+// 전체 학급 통계 처리 (기존)
+function processStats(records) {
+  // UI 전환
+  document.getElementById('class-stats').style.display = 'block';
+  document.getElementById('individual-stats').style.display = 'none';
+
+  // 기존 로직...
+  var totalRecords = records.length;
+  var totalMinutes = 0;
+  var uniqueDates = new Set();
+  var subjectTime = { 국어: 0, 영어: 0, 수학: 0, 과학: 0, 사회: 0, 기타: 0 };
+  var studentTime = {};
+  var dailyTime = {};
+
+  records.forEach(r => {
+    if (r.checkin && r.checkout) {
+      var mins = calcDuration(r.checkin, r.checkout);
+      totalMinutes += mins;
+      uniqueDates.add(r.date);
+
+      if (!studentTime[r.name]) studentTime[r.name] = 0;
+      studentTime[r.name] += mins;
+
+      if (!dailyTime[r.date]) dailyTime[r.date] = 0;
+      dailyTime[r.date] += mins;
+
+      if (r.content) {
+        var subjects = parseSubjects(r.content);
+        Object.keys(subjects).forEach(subj => {
+          if (subjectTime[subj] !== undefined) {
+            subjectTime[subj] += subjects[subj];
+          } else {
+            subjectTime['기타'] += subjects[subj];
+          }
+        });
+      }
+    }
+  });
+
+  var avgMinutes = totalRecords > 0 ? Math.round(totalMinutes / totalRecords) : 0;
+  var totalDays = uniqueDates.size;
+  var totalHours = Math.round(totalMinutes / 60);
+  var attendanceRate = totalRecords > 0 ? Math.round((totalRecords / (totalDays * 14)) * 100) : 0;
+
+  document.getElementById('attendance-rate').textContent = attendanceRate + '%';
+  document.getElementById('attendance-sub').textContent = totalRecords + '건 기록';
+  document.getElementById('avg-study-time').textContent = avgMinutes + '분';
+  document.getElementById('time-sub').textContent = '1인당 평균';
+  document.getElementById('total-days').textContent = totalDays + '일';
+  document.getElementById('days-sub').textContent = '자습 일수';
+  document.getElementById('total-hours').textContent = totalHours + '시간';
+  document.getElementById('hours-sub').textContent = '전체 합계';
+
+  createSubjectChart(subjectTime);
+  createDailyChart(dailyTime);
+  createStudentChart(studentTime);
+}
+
+// 개인 과목별 차트
+var indSubjectChartInstance = null;
+function createIndSubjectChart(data) {
+  var ctx = document.getElementById('ind-subject-chart').getContext('2d');
+
+  if (indSubjectChartInstance) indSubjectChartInstance.destroy();
+
+  indSubjectChartInstance = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: Object.keys(data),
+      datasets: [{
+        data: Object.values(data),
+        backgroundColor: ['#667eea', '#764ba2', '#60a5fa', '#34d399', '#f59e0b', '#f87171']
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { color: '#e2e8f0', font: { family: 'Noto Sans KR' } }
+        }
+      }
+    }
+  });
+}
+
+// 개인 일별 차트
+var indDailyChartInstance = null;
+function createIndDailyChart(data) {
+  var ctx = document.getElementById('ind-daily-chart').getContext('2d');
+
+  if (indDailyChartInstance) indDailyChartInstance.destroy();
+
+  var sortedDates = Object.keys(data).sort();
+  var values = sortedDates.map(d => Math.round(data[d] / 60));
+
+  indDailyChartInstance = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: sortedDates.map(d => d.substring(5)),
+      datasets: [{
+        label: '공부 시간 (시간)',
+        data: values,
+        borderColor: '#764ba2',
+        backgroundColor: 'rgba(118,75,162,0.1)',
+        tension: 0.4,
+        fill: true
       }]
     },
     options: {
