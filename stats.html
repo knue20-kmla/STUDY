@@ -10,27 +10,41 @@
 <style>
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 :root {
-  --bg:#0a0e1a; --surface:#141824; --surface2:#1e2333;
-  --border:rgba(255,255,255,0.06); --border-h:rgba(255,255,255,0.12);
-  --accent:#4a5fc1; --accent-dim:rgba(74,95,193,0.1);
-  --blue:#60a5fa; --green:#10b981; --red:#ef4444; --purple:#764ba2;
+  --bg:#f8f9fa; --surface:#ffffff; --surface2:#f1f3f5;
+  --border:rgba(0,0,0,0.08); --border-h:rgba(0,0,0,0.12);
+  --accent:#1e3c72; --accent-dim:rgba(30,60,114,0.08);
+  --blue:#4a90e2; --green:#28a745; --red:#dc3545; --purple:#764ba2;
   --gold:#d4af37;
-  --text:#f0f4f8; --text-muted:#6b7a90;
+  --text:#212529; --text-muted:#6c757d;
   --r:16px;
 }
 html,body { height: 100%; font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: var(--text); }
 body {
   background-image:
-    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(74,95,193,0.08) 0%, transparent 60%),
-    radial-gradient(circle at 20% 80%, rgba(212,175,55,0.03) 0%, transparent 50%);
+    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(30,60,114,0.03) 0%, transparent 60%),
+    radial-gradient(circle at 80% 20%, rgba(74,144,226,0.02) 0%, transparent 50%);
 }
 .container { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
 
 .header {
   text-align: center;
   margin-bottom: 48px;
-  padding-bottom: 24px;
+  padding: 48px 32px;
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  border-radius: 24px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   position: relative;
+  overflow: hidden;
+}
+.header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+  border-radius: 50%;
 }
 .header::after {
   content: '';
@@ -39,21 +53,24 @@ body {
   left: 50%;
   transform: translateX(-50%);
   width: 80px;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  height: 3px;
+  background: var(--gold);
+  border-radius: 2px;
+}
+.header-content {
+  position: relative;
+  z-index: 1;
 }
 .header h1 {
   font-size: 36px;
   font-weight: 800;
   margin-bottom: 12px;
-  background: linear-gradient(135deg, var(--text) 0%, #b8c5d6 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: white;
   letter-spacing: -0.02em;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 .header p {
-  color: var(--text-muted);
+  color: rgba(255,255,255,0.9);
   font-size: 15px;
   font-weight: 400;
 }
@@ -62,21 +79,22 @@ body {
   align-items: center;
   gap: 8px;
   padding: 12px 24px;
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: white;
+  border: 2px solid rgba(0,0,0,0.08);
   border-radius: 12px;
   color: var(--text);
   text-decoration: none;
   font-size: 14px;
   font-weight: 600;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 .back-btn:hover {
   border-color: var(--accent);
-  background: var(--surface2);
+  background: var(--accent-dim);
+  color: var(--accent);
   transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(74,95,193,0.2);
+  box-shadow: 0 4px 16px rgba(30,60,114,0.15);
 }
 
 .stats-grid {
@@ -86,14 +104,25 @@ body {
   margin-bottom: 40px;
 }
 .stat-card {
-  background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%);
-  border: 1px solid var(--border);
+  background: white;
+  border: 2px solid var(--border);
   border-radius: var(--r);
   padding: 28px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--blue));
+  opacity: 0;
+  transition: opacity 0.3s;
 }
 .stat-card::after {
   content: '';
@@ -110,27 +139,30 @@ body {
 .stat-card:hover {
   border-color: var(--accent);
   transform: translateY(-4px);
-  box-shadow: 0 8px 32px rgba(74,95,193,0.25);
+  box-shadow: 0 8px 24px rgba(30,60,114,0.12);
+}
+.stat-card:hover::before {
+  opacity: 1;
 }
 .stat-icon { font-size: 36px; margin-bottom: 16px; }
-.stat-label { font-size: 13px; color: var(--text-muted); margin-bottom: 10px; font-weight: 600; letter-spacing: 0.03em; }
+.stat-label { font-size: 13px; color: var(--text-muted); margin-bottom: 10px; font-weight: 600; letter-spacing: 0.03em; text-transform: uppercase; }
 .stat-value { font-size: 32px; font-weight: 900; color: var(--text); letter-spacing: -0.02em; }
 .stat-sub { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
 
 .chart-section { margin-bottom: 40px; }
 .chart-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: white;
+  border: 2px solid var(--border);
   border-radius: var(--r);
   padding: 32px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
   transition: all 0.3s;
 }
 .chart-card:hover {
   border-color: var(--border-h);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
 }
-.chart-title { font-size: 20px; font-weight: 700; margin-bottom: 24px; letter-spacing: -0.01em; }
+.chart-title { font-size: 20px; font-weight: 700; margin-bottom: 24px; letter-spacing: -0.01em; color: var(--text); }
 .chart-container { position: relative; height: 320px; }
 
 .loading {
@@ -155,22 +187,22 @@ body {
   gap: 16px;
   margin-bottom: 32px;
   padding: 20px;
-  background: var(--surface);
+  background: white;
   border-radius: var(--r);
-  border: 1px solid var(--border);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  border: 2px solid var(--border);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 .date-picker label {
   font-size: 14px;
   font-weight: 600;
-  color: var(--text-muted);
+  color: var(--text);
   letter-spacing: 0.02em;
 }
 .date-picker input,
 .date-picker select {
   padding: 10px 14px;
   background: var(--surface2);
-  border: 1px solid var(--border);
+  border: 2px solid var(--border);
   border-radius: 10px;
   color: var(--text);
   font-size: 14px;
@@ -179,24 +211,24 @@ body {
 .date-picker input:focus,
 .date-picker select:focus {
   border-color: var(--accent);
-  background: var(--surface);
+  background: white;
   outline: none;
   box-shadow: 0 0 0 3px var(--accent-dim);
 }
 .date-picker button {
   padding: 10px 20px;
-  background: linear-gradient(135deg, var(--accent) 0%, #6b7ed6 100%);
+  background: linear-gradient(135deg, var(--accent) 0%, #2a5298 100%);
   border: none;
   border-radius: 10px;
   color: white;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 16px rgba(74,95,193,0.3);
+  box-shadow: 0 4px 12px rgba(30,60,114,0.25);
 }
 .date-picker button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 24px rgba(74,95,193,0.4);
+  box-shadow: 0 6px 20px rgba(30,60,114,0.35);
 }
 
 @media (max-width: 768px) {
@@ -212,8 +244,10 @@ body {
   </div>
 
   <div class="header">
-    <h1>📊 자습 통계 대시보드</h1>
-    <p>3학년 2반 자습 활동 분석</p>
+    <div class="header-content">
+      <h1>📊 자습 통계 대시보드</h1>
+      <p>3학년 2반 자습 활동 분석 · 담임교사 전용</p>
+    </div>
   </div>
 
   <div class="date-picker">

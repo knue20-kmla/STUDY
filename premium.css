@@ -1,44 +1,47 @@
 /* ═══════════════════════════════════════════════════════════════
    민족사관고등학교 Premium Design System
-   세련되고 고급스러운 학술적 디자인
+   밝고 편안한 블루 톤 - 통합 대시보드와 통일
    ═══════════════════════════════════════════════════════════════ */
 
-/* ── 색상 팔레트 재정의 (더 고급스럽게) ── */
+/* ── 색상 팔레트 재정의 (밝은 블루 톤) ── */
 :root {
-  /* 베이스 */
-  --bg: #0a0e1a;
-  --surface: #141824;
-  --surface2: #1e2333;
-  --surface3: #262d42;
+  /* 베이스 - 밝은 톤 */
+  --bg: #f8f9fa;
+  --surface: #ffffff;
+  --surface2: #f1f3f5;
+  --surface3: #e9ecef;
 
   /* 보더 */
-  --border: rgba(255,255,255,0.06);
-  --border-h: rgba(255,255,255,0.12);
+  --border: rgba(0,0,0,0.08);
+  --border-h: rgba(0,0,0,0.12);
 
-  /* 액센트 - 로얄 블루 & 골드 */
-  --primary: #4a5fc1;
-  --primary-light: #6b7ed6;
-  --primary-dim: rgba(74,95,193,0.1);
-  --primary-glow: rgba(74,95,193,0.25);
+  /* 액센트 - 블루 그라데이션 */
+  --primary: #1e3c72;
+  --primary-light: #2a5298;
+  --primary-dim: rgba(30,60,114,0.08);
+  --primary-glow: rgba(30,60,114,0.15);
+
+  --secondary: #4a90e2;
+  --secondary-light: #64a8f5;
 
   --gold: #d4af37;
   --gold-dim: rgba(212,175,55,0.1);
 
-  /* 텍스트 */
-  --text: #f0f4f8;
-  --text-secondary: #b8c5d6;
-  --text-muted: #6b7a90;
+  /* 텍스트 - 어두운 톤 */
+  --text: #212529;
+  --text-secondary: #495057;
+  --text-muted: #6c757d;
 
   /* 상태 */
-  --success: #10b981;
-  --warning: #f59e0b;
-  --error: #ef4444;
-  --info: #3b82f6;
+  --success: #28a745;
+  --warning: #ffc107;
+  --error: #dc3545;
+  --info: #17a2b8;
 
   /* 그림자 */
-  --shadow-sm: 0 2px 8px rgba(0,0,0,0.2);
-  --shadow-md: 0 4px 16px rgba(0,0,0,0.3);
-  --shadow-lg: 0 8px 32px rgba(0,0,0,0.4);
+  --shadow-sm: 0 2px 4px rgba(0,0,0,0.08);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
 
   /* 반경 */
   --radius: 16px;
@@ -50,26 +53,31 @@
 body {
   background: var(--bg) !important;
   background-image:
-    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(74,95,193,0.08) 0%, transparent 60%),
-    radial-gradient(circle at 20% 80%, rgba(212,175,55,0.03) 0%, transparent 50%) !important;
+    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(30,60,114,0.03) 0%, transparent 60%),
+    radial-gradient(circle at 80% 20%, rgba(74,144,226,0.02) 0%, transparent 50%) !important;
 }
 
 /* ── 헤더 고급화 ── */
 .page-header {
-  padding: 32px 0 24px !important;
+  padding: 40px 0 32px !important;
   text-align: center;
   position: relative;
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  margin: -16px -16px 24px -16px;
+  border-radius: 0 0 24px 24px;
+  box-shadow: var(--shadow-md);
 }
 
 .page-header::after {
   content: '';
   position: absolute;
-  bottom: 0;
+  bottom: -2px;
   left: 50%;
   transform: translateX(-50%);
-  width: 60px;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  width: 80px;
+  height: 3px;
+  background: var(--gold);
+  border-radius: 2px;
 }
 
 .school-tag {
@@ -79,9 +87,9 @@ body {
   font-size: 11px !important;
   font-weight: 600 !important;
   letter-spacing: 0.15em !important;
-  color: var(--gold) !important;
+  color: rgba(255,255,255,0.9) !important;
   text-transform: uppercase !important;
-  margin-bottom: 16px !important;
+  margin-bottom: 12px !important;
 }
 
 .school-tag::before,
@@ -89,53 +97,36 @@ body {
   content: '' !important;
   width: 24px !important;
   height: 1px !important;
-  background: linear-gradient(90deg, transparent, var(--gold), transparent) !important;
+  background: rgba(255,255,255,0.4) !important;
 }
 
 .page-header h1 {
   font-size: 32px !important;
   font-weight: 800 !important;
   letter-spacing: -0.02em !important;
-  background: linear-gradient(135deg, #f0f4f8 0%, #b8c5d6 100%) !important;
-  -webkit-background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-  background-clip: text !important;
+  color: white !important;
+  background: none !important;
+  -webkit-text-fill-color: white !important;
   margin-bottom: 8px !important;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 .page-header p {
   font-size: 14px !important;
-  color: var(--text-muted) !important;
+  color: rgba(255,255,255,0.85) !important;
   font-weight: 400 !important;
 }
 
 /* ── 로고 섹션 개선 ── */
 .logo-section {
-  background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%) !important;
-  border-bottom: 1px solid var(--border) !important;
-  position: relative;
-  overflow: hidden;
-}
-
-.logo-section::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--gold), transparent);
-  opacity: 0.5;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%) !important;
+  border-bottom: none !important;
+  box-shadow: var(--shadow-md) !important;
 }
 
 .school-logo {
-  border: 2px solid var(--gold) !important;
-  box-shadow: 0 4px 16px rgba(212,175,55,0.2) !important;
-}
-
-.logo {
-  font-weight: 800 !important;
-  letter-spacing: -0.01em !important;
+  border: 3px solid white !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1) !important;
 }
 
 /* ── 카드 고급화 ── */
@@ -156,20 +147,20 @@ body {
   top: 0;
   left: 0;
   right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--primary), transparent);
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
   opacity: 0;
   transition: opacity 0.3s;
 }
 
 .card:hover {
   border-color: var(--primary) !important;
-  box-shadow: 0 8px 32px rgba(74,95,193,0.2) !important;
+  box-shadow: var(--shadow-lg) !important;
   transform: translateY(-4px) !important;
 }
 
 .card:hover::before {
-  opacity: 0.5;
+  opacity: 1;
 }
 
 /* ── 버튼 고급화 ── */
@@ -191,7 +182,7 @@ body {
   width: 0;
   height: 0;
   border-radius: 50%;
-  background: rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.2);
   transform: translate(-50%, -50%);
   transition: width 0.6s, height 0.6s;
 }
@@ -205,29 +196,30 @@ body {
   background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%) !important;
   color: white !important;
   border: none !important;
-  box-shadow: 0 4px 16px rgba(74,95,193,0.3) !important;
+  box-shadow: 0 4px 12px rgba(30,60,114,0.25) !important;
 }
 
 .btn-primary:hover {
-  box-shadow: 0 6px 24px rgba(74,95,193,0.4) !important;
+  box-shadow: 0 6px 20px rgba(30,60,114,0.35) !important;
   transform: translateY(-2px) !important;
 }
 
 .btn-secondary {
-  background: var(--surface2) !important;
-  border: 1px solid var(--border) !important;
+  background: var(--surface) !important;
+  border: 2px solid var(--border) !important;
   color: var(--text) !important;
 }
 
 .btn-secondary:hover {
   border-color: var(--primary) !important;
-  background: var(--surface3) !important;
+  background: var(--primary-dim) !important;
+  color: var(--primary) !important;
 }
 
 /* ── 날짜 히어로 고급화 ── */
 .date-hero {
-  background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%) !important;
-  border: 1px solid var(--border) !important;
+  background: var(--surface) !important;
+  border: 2px solid var(--border) !important;
   border-radius: var(--radius-lg) !important;
   box-shadow: var(--shadow-md) !important;
   position: relative;
@@ -240,8 +232,8 @@ body {
   top: 0;
   left: 0;
   right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, var(--primary), var(--gold), var(--primary));
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary), var(--secondary), var(--primary));
   background-size: 200% 100%;
   animation: shimmer 3s linear infinite;
 }
@@ -255,36 +247,41 @@ body {
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 70% 30%, rgba(74,95,193,0.05) 0%, transparent 50%);
+  background: radial-gradient(circle at 70% 30%, rgba(30,60,114,0.02) 0%, transparent 50%);
   pointer-events: none;
 }
 
 /* ── 학생 버튼 고급화 ── */
 .stu-btn {
   background: var(--surface) !important;
-  border: 1px solid var(--border) !important;
+  border: 2px solid var(--border) !important;
   border-radius: var(--radius-sm) !important;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
   box-shadow: var(--shadow-sm) !important;
+  color: var(--text) !important;
 }
 
 .stu-btn:hover {
   border-color: var(--primary) !important;
   background: var(--primary-dim) !important;
-  box-shadow: 0 4px 16px rgba(74,95,193,0.2) !important;
+  box-shadow: var(--shadow-md) !important;
   transform: translateY(-3px) scale(1.02) !important;
 }
 
 .stu-btn .s-num {
-  color: var(--gold) !important;
+  color: var(--primary) !important;
   font-weight: 700 !important;
+}
+
+.stu-btn .s-name {
+  color: var(--text) !important;
 }
 
 /* ── 입력 필드 고급화 ── */
 .form-input,
 .form-textarea {
-  background: var(--surface2) !important;
-  border: 1px solid var(--border) !important;
+  background: var(--surface) !important;
+  border: 2px solid var(--border) !important;
   border-radius: var(--radius-sm) !important;
   color: var(--text) !important;
   transition: all 0.3s !important;
@@ -293,7 +290,7 @@ body {
 .form-input:focus,
 .form-textarea:focus {
   border-color: var(--primary) !important;
-  background: var(--surface3) !important;
+  background: var(--surface) !important;
   box-shadow: 0 0 0 3px var(--primary-dim) !important;
   outline: none !important;
 }
@@ -308,8 +305,8 @@ body {
 
 /* ── 통계 카드 고급화 ── */
 .stat-card {
-  background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%) !important;
-  border: 1px solid var(--border) !important;
+  background: var(--surface) !important;
+  border: 2px solid var(--border) !important;
   border-radius: var(--radius) !important;
   padding: 24px !important;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
@@ -332,7 +329,7 @@ body {
 
 .stat-card:hover {
   border-color: var(--primary) !important;
-  box-shadow: 0 8px 32px rgba(74,95,193,0.2) !important;
+  box-shadow: var(--shadow-lg) !important;
   transform: translateY(-4px) !important;
 }
 
@@ -340,8 +337,9 @@ body {
 .nav-item {
   background: transparent !important;
   border: none !important;
-  border-left: 2px solid transparent !important;
+  border-left: 3px solid transparent !important;
   transition: all 0.3s !important;
+  color: var(--text) !important;
 }
 
 .nav-item:hover {
@@ -351,22 +349,23 @@ body {
 
 .nav-item.active {
   background: var(--primary-dim) !important;
-  border-left-color: var(--gold) !important;
+  border-left-color: var(--primary) !important;
+  color: var(--primary) !important;
 }
 
 /* ── 스크롤바 고급화 ── */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--surface);
+  background: var(--surface2);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--surface3);
-  border-radius: 4px;
+  background: var(--border-h);
+  border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -378,6 +377,9 @@ body {
   border-radius: var(--radius-sm) !important;
   box-shadow: var(--shadow-lg) !important;
   backdrop-filter: blur(10px);
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  border: 2px solid var(--border) !important;
 }
 
 /* ── 애니메이션 개선 ── */
@@ -396,8 +398,18 @@ body {
   animation: fadeUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
+/* ── 섹션 구분선 ── */
+.sec-div {
+  color: var(--text) !important;
+  font-weight: 600 !important;
+}
+
 /* ── 반응형 개선 ── */
 @media (max-width: 640px) {
+  .page-header {
+    padding: 32px 16px 24px !important;
+  }
+
   .page-header h1 {
     font-size: 28px !important;
   }
