@@ -1,0 +1,412 @@
+/* ═══════════════════════════════════════════════════════════════
+   민족사관고등학교 Premium Design System
+   세련되고 고급스러운 학술적 디자인
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── 색상 팔레트 재정의 (더 고급스럽게) ── */
+:root {
+  /* 베이스 */
+  --bg: #0a0e1a;
+  --surface: #141824;
+  --surface2: #1e2333;
+  --surface3: #262d42;
+
+  /* 보더 */
+  --border: rgba(255,255,255,0.06);
+  --border-h: rgba(255,255,255,0.12);
+
+  /* 액센트 - 로얄 블루 & 골드 */
+  --primary: #4a5fc1;
+  --primary-light: #6b7ed6;
+  --primary-dim: rgba(74,95,193,0.1);
+  --primary-glow: rgba(74,95,193,0.25);
+
+  --gold: #d4af37;
+  --gold-dim: rgba(212,175,55,0.1);
+
+  /* 텍스트 */
+  --text: #f0f4f8;
+  --text-secondary: #b8c5d6;
+  --text-muted: #6b7a90;
+
+  /* 상태 */
+  --success: #10b981;
+  --warning: #f59e0b;
+  --error: #ef4444;
+  --info: #3b82f6;
+
+  /* 그림자 */
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.2);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.3);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.4);
+
+  /* 반경 */
+  --radius: 16px;
+  --radius-sm: 12px;
+  --radius-lg: 20px;
+}
+
+/* ── 배경 개선 ── */
+body {
+  background: var(--bg) !important;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(74,95,193,0.08) 0%, transparent 60%),
+    radial-gradient(circle at 20% 80%, rgba(212,175,55,0.03) 0%, transparent 50%) !important;
+}
+
+/* ── 헤더 고급화 ── */
+.page-header {
+  padding: 32px 0 24px !important;
+  text-align: center;
+  position: relative;
+}
+
+.page-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+.school-tag {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.15em !important;
+  color: var(--gold) !important;
+  text-transform: uppercase !important;
+  margin-bottom: 16px !important;
+}
+
+.school-tag::before,
+.school-tag::after {
+  content: '' !important;
+  width: 24px !important;
+  height: 1px !important;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent) !important;
+}
+
+.page-header h1 {
+  font-size: 32px !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.02em !important;
+  background: linear-gradient(135deg, #f0f4f8 0%, #b8c5d6 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  margin-bottom: 8px !important;
+}
+
+.page-header p {
+  font-size: 14px !important;
+  color: var(--text-muted) !important;
+  font-weight: 400 !important;
+}
+
+/* ── 로고 섹션 개선 ── */
+.logo-section {
+  background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%) !important;
+  border-bottom: 1px solid var(--border) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.logo-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  opacity: 0.5;
+}
+
+.school-logo {
+  border: 2px solid var(--gold) !important;
+  box-shadow: 0 4px 16px rgba(212,175,55,0.2) !important;
+}
+
+.logo {
+  font-weight: 800 !important;
+  letter-spacing: -0.01em !important;
+}
+
+/* ── 카드 고급화 ── */
+.card {
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius) !important;
+  padding: 24px !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-shadow: var(--shadow-sm) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--primary), transparent);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.card:hover {
+  border-color: var(--primary) !important;
+  box-shadow: 0 8px 32px rgba(74,95,193,0.2) !important;
+  transform: translateY(-4px) !important;
+}
+
+.card:hover::before {
+  opacity: 0.5;
+}
+
+/* ── 버튼 고급화 ── */
+.btn {
+  border-radius: var(--radius-sm) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.02em !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-shadow: var(--shadow-sm) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.btn:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%) !important;
+  color: white !important;
+  border: none !important;
+  box-shadow: 0 4px 16px rgba(74,95,193,0.3) !important;
+}
+
+.btn-primary:hover {
+  box-shadow: 0 6px 24px rgba(74,95,193,0.4) !important;
+  transform: translateY(-2px) !important;
+}
+
+.btn-secondary {
+  background: var(--surface2) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text) !important;
+}
+
+.btn-secondary:hover {
+  border-color: var(--primary) !important;
+  background: var(--surface3) !important;
+}
+
+/* ── 날짜 히어로 고급화 ── */
+.date-hero {
+  background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--shadow-md) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.date-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--primary), var(--gold), var(--primary));
+  background-size: 200% 100%;
+  animation: shimmer 3s linear infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.date-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 70% 30%, rgba(74,95,193,0.05) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+/* ── 학생 버튼 고급화 ── */
+.stu-btn {
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-sm) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+
+.stu-btn:hover {
+  border-color: var(--primary) !important;
+  background: var(--primary-dim) !important;
+  box-shadow: 0 4px 16px rgba(74,95,193,0.2) !important;
+  transform: translateY(-3px) scale(1.02) !important;
+}
+
+.stu-btn .s-num {
+  color: var(--gold) !important;
+  font-weight: 700 !important;
+}
+
+/* ── 입력 필드 고급화 ── */
+.form-input,
+.form-textarea {
+  background: var(--surface2) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-sm) !important;
+  color: var(--text) !important;
+  transition: all 0.3s !important;
+}
+
+.form-input:focus,
+.form-textarea:focus {
+  border-color: var(--primary) !important;
+  background: var(--surface3) !important;
+  box-shadow: 0 0 0 3px var(--primary-dim) !important;
+  outline: none !important;
+}
+
+/* ── 배지 고급화 ── */
+.card-badge.new {
+  background: linear-gradient(135deg, var(--gold) 0%, #c99a2e 100%) !important;
+  color: #000 !important;
+  font-weight: 700 !important;
+  box-shadow: 0 2px 8px rgba(212,175,55,0.3) !important;
+}
+
+/* ── 통계 카드 고급화 ── */
+.stat-card {
+  background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius) !important;
+  padding: 24px !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100px;
+  height: 100px;
+  background: radial-gradient(circle, var(--primary-dim) 0%, transparent 70%);
+  border-radius: 50%;
+  transform: translate(40%, -40%);
+  pointer-events: none;
+}
+
+.stat-card:hover {
+  border-color: var(--primary) !important;
+  box-shadow: 0 8px 32px rgba(74,95,193,0.2) !important;
+  transform: translateY(-4px) !important;
+}
+
+/* ── 네비게이션 개선 ── */
+.nav-item {
+  background: transparent !important;
+  border: none !important;
+  border-left: 2px solid transparent !important;
+  transition: all 0.3s !important;
+}
+
+.nav-item:hover {
+  background: var(--primary-dim) !important;
+  border-left-color: var(--primary) !important;
+}
+
+.nav-item.active {
+  background: var(--primary-dim) !important;
+  border-left-color: var(--gold) !important;
+}
+
+/* ── 스크롤바 고급화 ── */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--surface);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--surface3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+}
+
+/* ── 토스트 고급화 ── */
+.toast {
+  border-radius: var(--radius-sm) !important;
+  box-shadow: var(--shadow-lg) !important;
+  backdrop-filter: blur(10px);
+}
+
+/* ── 애니메이션 개선 ── */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.view.active {
+  animation: fadeUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* ── 반응형 개선 ── */
+@media (max-width: 640px) {
+  .page-header h1 {
+    font-size: 28px !important;
+  }
+
+  .card {
+    padding: 20px !important;
+  }
+
+  .stat-card {
+    padding: 20px !important;
+  }
+}
