@@ -10,17 +10,17 @@
 <style>
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 :root {
-  --bg:#e8eef5; --surface:#ffffff; --surface2:#f5f7fa;
-  --border:rgba(30,60,114,0.1); --border-h:rgba(30,60,114,0.2);
-  --accent:#1e3c72; --accent-dim:rgba(30,60,114,0.08);
-  --blue:#4a90e2; --green:#28a745; --red:#dc3545; --purple:#764ba2;
+  --bg:#0f1729; --surface:#1a2332; --surface2:#242f42;
+  --border:rgba(255,255,255,0.08); --border-h:rgba(255,255,255,0.15);
+  --accent:#4a90e2; --accent-dim:rgba(74,144,226,0.12);
+  --blue:#5a9ff5; --green:#28a745; --red:#dc3545; --purple:#764ba2;
   --gold:#d4af37;
-  --text:#212529; --text-muted:#6c757d;
+  --text:#e8f0f8; --text-muted:#7a8ba3;
   --r:16px;
 }
 html,body { height: 100%; font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: var(--text); }
 body {
-  background: linear-gradient(135deg, #e8eef5 0%, #f0f4f8 50%, #e8eef5 100%);
+  background: linear-gradient(135deg, #0f1729 0%, #1a2841 50%, #0f1729 100%);
   background-attachment: fixed;
 }
 .container { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
@@ -78,22 +78,22 @@ body {
   align-items: center;
   gap: 8px;
   padding: 12px 24px;
-  background: white;
-  border: 2px solid rgba(0,0,0,0.08);
+  background: var(--surface);
+  border: 2px solid var(--border);
   border-radius: 12px;
   color: var(--text);
   text-decoration: none;
   font-size: 14px;
   font-weight: 600;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 .back-btn:hover {
   border-color: var(--accent);
   background: var(--accent-dim);
   color: var(--accent);
   transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(30,60,114,0.15);
+  box-shadow: 0 4px 16px rgba(74,144,226,0.3);
 }
 
 .stats-grid {
@@ -103,14 +103,14 @@ body {
   margin-bottom: 40px;
 }
 .stat-card {
-  background: white;
+  background: var(--surface);
   border: 2px solid var(--border);
   border-radius: var(--r);
   padding: 28px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 .stat-card::before {
   content: '';
@@ -138,7 +138,7 @@ body {
 .stat-card:hover {
   border-color: var(--accent);
   transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(30,60,114,0.12);
+  box-shadow: 0 8px 24px rgba(74,144,226,0.25);
 }
 .stat-card:hover::before {
   opacity: 1;
@@ -150,16 +150,16 @@ body {
 
 .chart-section { margin-bottom: 40px; }
 .chart-card {
-  background: white;
+  background: var(--surface);
   border: 2px solid var(--border);
   border-radius: var(--r);
   padding: 32px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
   transition: all 0.3s;
 }
 .chart-card:hover {
   border-color: var(--border-h);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
 }
 .chart-title { font-size: 20px; font-weight: 700; margin-bottom: 24px; letter-spacing: -0.01em; color: var(--text); }
 .chart-container { position: relative; height: 320px; }
@@ -186,10 +186,10 @@ body {
   gap: 16px;
   margin-bottom: 32px;
   padding: 20px;
-  background: white;
+  background: var(--surface);
   border-radius: var(--r);
   border: 2px solid var(--border);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 .date-picker label {
   font-size: 14px;
@@ -210,24 +210,24 @@ body {
 .date-picker input:focus,
 .date-picker select:focus {
   border-color: var(--accent);
-  background: white;
+  background: var(--surface);
   outline: none;
   box-shadow: 0 0 0 3px var(--accent-dim);
 }
 .date-picker button {
   padding: 10px 20px;
-  background: linear-gradient(135deg, var(--accent) 0%, #2a5298 100%);
+  background: linear-gradient(135deg, var(--accent) 0%, #6ba3e8 100%);
   border: none;
   border-radius: 10px;
   color: white;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 12px rgba(30,60,114,0.25);
+  box-shadow: 0 4px 12px rgba(74,144,226,0.3);
 }
 .date-picker button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(30,60,114,0.35);
+  box-shadow: 0 6px 20px rgba(74,144,226,0.4);
 }
 
 @media (max-width: 768px) {
